@@ -89,12 +89,16 @@ module BrowseEverything
         [uri_for(path), {}]
       end
 
-      def auth_link
-        authenticator.authorize_url
+      def auth_link(host:, protocol:, port: 80)
+        authenticator.authorize_url redirect_uri: redirect_uri(host: host, protocol: protocol, port: port)
       end
 
-      def connect(params, _data)
-        auth_bearer = authenticator.get_token(params[:code])
+      def connect(params, _data, context)
+        auth_bearer = authenticator.get_token params[:code], redirect_uri: redirect_uri(
+          host: context.host,
+          protocol: context.protocol,
+          port: context.port
+        )
         self.token = auth_bearer.token
       end
 
@@ -110,6 +114,17 @@ module BrowseEverything
 
         def client
           DropboxApi::Client.new(token)
+        end
+
+        def redirect_uri(host:, protocol:, port: 80)
+          @redirect_uri ||= url_for(
+            controller: 'browse_everything',
+            action: 'auth',
+            host: host,
+            protocol: protocol,
+            port: port,
+            only_path: false
+          )
         end
     end
   end

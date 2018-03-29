@@ -39,7 +39,7 @@ class BrowseEverythingController < ActionController::Base
   # Authenticate against the Google API and store the token in the session
   def auth
     # params contains the access code with with the key :code
-    provider_session.token = provider.connect(params, provider_session.data)
+    provider_session.token = provider.connect(params, provider_session.data, request)
   end
 
   def resolve
@@ -80,7 +80,7 @@ class BrowseEverythingController < ActionController::Base
     # @return [String] the authentication link
     def auth_link
       @auth_link ||= if provider.present?
-                       link, data = provider.auth_link
+                       link, data = provider.auth_link(host: request.host, protocol: request.protocol, port: request.port)
                        provider_session.data = data
                        link = "#{link}&state=#{provider.key}" unless link.to_s.include?('state')
                        link

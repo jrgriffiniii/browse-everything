@@ -52,7 +52,7 @@ module BrowseEverything
         []
       end
 
-      def connect(_params, _data)
+      def connect(_params, _data, _context)
         nil
       end
 
