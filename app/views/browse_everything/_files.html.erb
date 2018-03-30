@@ -51,7 +51,9 @@
         <% end %>
 
         <td role="gridcell" class="ev-file-size">
-          <%= number_to_human_size(file.size).sub(/Bytes/,'bytes') %>
+          <% if file.size %>
+            <%= number_to_human_size(file.size).sub(/Bytes/,'bytes') %>
+          <% end %>
         </td>
 
         <td role="gridcell" class="ev-file-kind">
@@ -59,7 +61,9 @@
         </td>
 
         <td role="gridcell" class="ev-file-date">
-          <%= file.mtime.strftime('%F %R') %>
+          <% if file.mtime %>
+            <%= file.mtime.strftime('%F %R') %>
+          <% end %>
         </td>
     </tr>
   <% end %>
