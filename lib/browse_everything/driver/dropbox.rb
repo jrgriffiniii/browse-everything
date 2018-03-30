@@ -61,7 +61,9 @@ module BrowseEverything
       end
 
       def contents(path = '')
-        result = client.list_folder(path)
+        path ||= ''
+        client_path = path.empty? ? '' : "/#{path}"
+        result = client.list_folder(client_path)
         result.entries.map { |entry| FileEntryFactory.build(metadata: entry, key: key) }
       end
 
