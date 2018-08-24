@@ -78,10 +78,9 @@ module BrowserConfigHelper
                                  client_secret: 'GoogleClientSecret'
                                },
                                's3' => {
-                                 app_key: 'S3AppKey',
-                                 app_secret: 'S3AppSecret',
-                                 bucket: 's3.bucket',
-                                 region: 's3.region'
+                                 client_id: 'S3AppKey',
+                                 client_secret: 'S3AppSecret',
+                                 bucket: 's3.bucket'
                                })
   end
 
