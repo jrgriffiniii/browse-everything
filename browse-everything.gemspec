@@ -22,6 +22,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'addressable', '~> 2.5'
   spec.add_dependency 'aws-sdk-s3'
   spec.add_dependency 'dropbox_api', '>= 0.1.10'
+  spec.add_dependency 'font-awesome-rails'
   spec.add_dependency 'google-api-client', '~> 0.23'
   spec.add_dependency 'google_drive', '~> 2.1'
   spec.add_dependency 'googleauth', '0.6.6'
@@ -29,7 +30,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rails', '>= 4.2'
   spec.add_dependency 'ruby-box'
   spec.add_dependency 'signet', '~> 0.8'
-  spec.add_dependency 'thor', '~> 0.19'
+  spec.add_dependency 'thor', '~> 0.19.4'
   spec.add_dependency 'typhoeus'
 
   spec.add_development_dependency 'bixby', '>= 1.0'
