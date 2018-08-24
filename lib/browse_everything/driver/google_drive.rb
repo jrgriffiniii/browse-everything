@@ -70,6 +70,8 @@ module BrowseEverything
       # @param path [String] the path (default to the root)
       # @return [Array<BrowseEverything::FileEntry>] file entries for the path
       def list_files(drive, request_params, path: '')
+        request_params.q += " and 'root' in parents" if path.empty? # See https://developers.google.com/drive/api/v3/folder
+
         drive.list_files(request_params.to_h) do |file_list, error|
           # Raise an exception if there was an error Google API's
           if error.present?
@@ -97,6 +99,7 @@ module BrowseEverything
         drive_service.batch do |drive|
           request_params = Auth::Google::RequestParameters.new
           request_params.q += " and '#{path}' in parents " if path.present?
+
           list_files(drive, request_params, path: path)
         end
 

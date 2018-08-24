@@ -34,7 +34,7 @@ module BrowseEverything
               field_constraint = constraints.join(" and #{field} ")
               field_queries << "#{field} #{field_constraint}"
             end
-            field_queries.join(' ')
+            field_queries.join(' and ')
           end
 
           def contraints
