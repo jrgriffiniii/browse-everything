@@ -158,6 +158,7 @@ module BrowseEverything
       # Authorization Object for Google API
       # @return [Google::Auth::UserAuthorizer]
       def authorizer
+        #binding.pry
         @authorizer ||= authenticate
       end
 
@@ -165,6 +166,7 @@ module BrowseEverything
       # This is *the* method which, passing an HTTP request, redeems an authorization code for an access token
       # @return [String] a new access token
       def authorize!
+        #binding.pry
         @credentials = authorizer.get_credentials_from_code(user_id: user_id, code: code)
         @token = @credentials.access_token
         @code = nil # The authorization code can only be redeemed for an access token once
