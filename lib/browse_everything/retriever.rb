@@ -70,7 +70,7 @@ module BrowseEverything
       end
 
       download_options = extract_download_options(options)
-      url = download_options.fetch(:url)
+      url = download_options[:url]
 
       case url.scheme
       when 'file'
@@ -91,8 +91,7 @@ module BrowseEverything
         url = options.fetch('url')
 
         # This avoids the potential for a KeyError
-        headers = options.fetch('auth_header', {}) || {}
-        headers.each_pair { |k, v| headers[k] = v.tr('+', ' ') }
+        headers = options.fetch('headers', {}) || {}
 
         file_size_value = options.fetch('file_size', 0)
         file_size = file_size_value.to_i
