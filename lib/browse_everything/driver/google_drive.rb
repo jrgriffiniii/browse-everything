@@ -175,7 +175,7 @@ module BrowseEverything
       # @param params [Hash] HTTP response passed to the OAuth callback
       # @param _data [Object,nil] an unused parameter
       # @return [String] a new access token
-      def connect(params, _data, url_options)
+      def connect(params, _data, _url_options)
         @code = params[:code]
         authorize!
       end
