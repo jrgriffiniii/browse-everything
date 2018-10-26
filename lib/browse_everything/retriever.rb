@@ -31,8 +31,19 @@ module BrowseEverything
     attr_accessor :chunk_size
 
     class << self
-      def can_retrieve?(uri)
-        Typhoeus.get(uri, headers: { Range: 'bytes=0-0' }).success?
+      # The previous strategy of using only a HEAD request to check the validity of a
+      # remote URL fails for Amazon S3 pre-signed URLs. S3 URLs are generated for a single
+      # verb only (in this case, GET), and will return a 403 Forbidden response if any
+      # other verb is used. The workaround is to issue a GET request instead, with a
+      # Range: header requesting only the first byte. The successful response status
+      # code is 206 instead of 200, but that is enough to satisfy the #success? method.
+      # @param uri [URI] the uri of the file to be downloaded
+      # @param headers [Hash] the HTTP headers for the request (this may contain the authentication token)
+      def can_retrieve?(uri, headers)
+        can_retrieve_headers = { Range: 'bytes=0-0' }
+        can_retrieve_headers.merge!(headers)
+        response = Typhoeus.get(uri, headers: can_retrieve_headers )
+        response.success?
       end
     end
 
