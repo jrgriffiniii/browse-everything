@@ -215,9 +215,12 @@ $(function() {
       $(node).show();
       sizeColumns(table);
       indicateSelected();
+      /*
       if ($(node.row).find('#select_all')[0].checked) {
         return selectAll(rows);
-      }}).always(function() {
+      }
+      */
+      }).always(function() {
         clearInterval(progressIntervalID);
         return stopWait();
     })
@@ -375,7 +378,7 @@ $(function() {
     if (row.hasClass('collapsed')) {
       return $('table#file-list').treetable('expandNode',node_id);
     } else {
-      return selectChildRows(row, action);
+      //return selectChildRows(row, action);
     }
   });
 
