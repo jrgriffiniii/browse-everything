@@ -376,9 +376,9 @@ $(function() {
     const row = $(this).closest('tr');
     const node_id = row.find('td.ev-file-name a.ev-link').attr('href');
     if (row.hasClass('collapsed')) {
-      return $('table#file-list').treetable('expandNode',node_id);
+      //return $('table#file-list').treetable('expandNode',node_id);
     } else {
-      //return selectChildRows(row, action);
+      return selectChildRows(row, action);
     }
   });
 
