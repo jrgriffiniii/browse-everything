@@ -54,8 +54,7 @@ $(function() {
   const indicateSelected = () =>
     $('input.ev-url').each(function() {
       return $(`*[data-ev-location='${$(this).val()}']`).addClass('ev-selected');
-    })
-  ;
+    });
 
   const fileIsSelected = function(row) {
     let result = false;
@@ -80,6 +79,12 @@ $(function() {
   var selectFile = function(row) {
     const target_form = $('form.ev-submit-form');
     const file_location = row.data('ev-location');
+    // This is a work-around for the jQuery event binding
+    // This should likely be refactored and log a warning
+    if (typeof(file_location) == 'undefined') {
+      console.warn(`Undefined ev-location data attribute for ${row.outerHTML}`)
+      return;
+    }
     const hidden_input = $("<input type='hidden' class='ev-url' name='selected_files[]'/>").val(file_location);
     target_form.append(hidden_input);
     if (!$(row).find('.ev-select-file').prop('checked')) {
@@ -115,12 +120,16 @@ $(function() {
         const box = $(this).find('#select_all')[0];
         $(box).prop('checked', true);
         $(box).prop('value', "1");
+        if (!fileIsSelected($(this))) {
+          selectFile($(this));
+        } else {
+          unselectFile($(this));
+        }
         return toggleBranchSelect($(this));
       } else {
         if (!fileIsSelected($(this))) { return toggleFileSelect($(this)); }
       }
-    })
-  ;
+    });
 
   const selectChildRows = (row, action) =>
     $('table#file-list tr').each(function() {
@@ -132,9 +141,13 @@ $(function() {
             $(box).prop('value', action);
             if (action === "1") {
               $(box).prop("checked", true);
+              $(this).addClass('ev-selected');
+              if (!fileIsSelected($(this))) { selectFile($(this)); }
               const node_id = $(this).find('td.ev-file-name a.ev-link').attr('href');
               return $('table#file-list').treetable('expandNode',node_id);
             } else {
+              $(this).removeClass('ev-selected');
+              unselectFile($(this));
               return $(box).prop("checked", false);
             }
           } else {
@@ -147,6 +160,12 @@ $(function() {
             }
             return updateFileCount();
           }
+        }
+      } else {
+        if (!fileIsSelected($(this))) {
+          selectFile($(this));
+        } else {
+          unselectFile($(this));
         }
       }
     })
@@ -321,6 +340,7 @@ $(function() {
     const row = $(this).closest('tr');
     const action = row.hasClass('expanded') ? 'collapseNode' : 'expandNode';
     const node_id = $(this).attr('href');
+
     return $('table#file-list').treetable(action,node_id);
   });
 
@@ -376,7 +396,11 @@ $(function() {
     const row = $(this).closest('tr');
     const node_id = row.find('td.ev-file-name a.ev-link').attr('href');
     if (row.hasClass('collapsed')) {
-      //return $('table#file-list').treetable('expandNode',node_id);
+      if (!fileIsSelected(row)) {
+        selectFile(row);
+      } else {
+        unselectFile(row);
+      }
     } else {
       return selectChildRows(row, action);
     }
