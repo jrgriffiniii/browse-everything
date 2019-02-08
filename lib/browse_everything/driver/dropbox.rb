@@ -78,7 +78,6 @@ module BrowseEverything
       def validate_config
         raise InitializationError, 'Dropbox driver requires a :client_id argument' unless config[:client_id]
         raise InitializationError, 'Dropbox driver requires a :client_secret argument' unless config[:client_secret]
-        raise InitializationError, 'Dropbox driver requires a :download_directory' unless config[:download_directory]
       end
 
       def contents(path = '')
@@ -88,8 +87,19 @@ module BrowseEverything
         @sorter.call(@entries)
       end
 
+      # Ensures that the "tmp" directory is used if there is no default download
+      # directory specified in the configuration
+      # @return [String]
+      def default_download_directory
+        Rails.root.join('tmp')
+      end
+
+      # Retrieves the directory path for downloads used when retrieving the
+      # resource from Dropbox
+      # @return [String]
       def download_directory_path
-        File.expand_path(config[:download_directory])
+        dir_path = config[:download_directory] || default_download_directory
+        File.expand_path(dir_path)
       end
 
       def downloaded_file_for(path)
