@@ -3,7 +3,6 @@
 require 'addressable'
 require 'tempfile'
 require 'typhoeus'
-require 'pry-byebug'
 
 module BrowseEverything
   # Class for raising errors when a download is invalid
@@ -38,11 +37,7 @@ module BrowseEverything
       def can_retrieve?(uri, headers = {})
 
         request_headers = headers.merge(Range: 'bytes=0-0')
-        # This should not be necessary, but for AWS S3 files, certain HTTP
-        # parameters are unnecessarily escaped
-        escaped_uri = URI.escape(uri.to_s)
-        unescaped_uri = URI.unescape(escaped_uri)
-        Typhoeus.get(unescaped_uri, headers: request_headers).success?
+        Typhoeus.get(uri, headers: request_headers).success?
       end
     end
 
