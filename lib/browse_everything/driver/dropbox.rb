@@ -78,6 +78,7 @@ module BrowseEverything
       def validate_config
         raise InitializationError, 'Dropbox driver requires a :client_id argument' unless config[:client_id]
         raise InitializationError, 'Dropbox driver requires a :client_secret argument' unless config[:client_secret]
+        raise InitializationError, 'Dropbox driver requires a :download_directory' unless config[:download_directory]
       end
 
       def contents(path = '')
@@ -87,11 +88,15 @@ module BrowseEverything
         @sorter.call(@entries)
       end
 
+      def download_directory_path
+        File.expand_path(config[:download_directory])
+      end
+
       def downloaded_file_for(path)
         return @downloaded_files[path] if @downloaded_files.key?(path)
 
         # This ensures that the name of the file its extension are preserved for user downloads
-        temp_file_path = File.join(Dir.mktmpdir, File.basename(path))
+        temp_file_path = File.join(download_directory_path, File.basename(path))
         temp_file = File.open(temp_file_path, mode: 'w+', encoding: 'ascii-8bit')
         client.download(path) do |chunk|
           temp_file.write chunk

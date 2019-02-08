@@ -8,7 +8,8 @@ describe BrowseEverything::Driver::Dropbox do
   let(:provider_yml) do
     {
       client_id: 'client-id',
-      client_secret: 'client-secret'
+      client_secret: 'client-secret',
+      download_directory: 'spec/fixtures/'
     }
   end
   let(:oauth_response_body) do
