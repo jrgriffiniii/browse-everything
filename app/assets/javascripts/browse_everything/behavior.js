@@ -256,6 +256,58 @@ $(function () {
     return $('.ev-submit').attr('disabled', false);
   };
 
+  var handleScroll = function(event) {
+    event.stopPropagation();
+    event.preventDefault();
+
+    var table = $('#file-list');
+    var page = $('#file-list tfoot .ev-next-page').data('provider-contents-pages-next');
+
+    var scrolled_offset = $(this).scrollTop();
+    var height = $(this).innerHeight();
+    var scrolled_height = this.scrollHeight;
+    var window_offset = Math.ceil(scrolled_offset + height, 1);
+
+    if (!((typeof page !== "undefined" && page !== null) && window_offset >= scrolled_height)) {
+        return;
+    }
+
+    var provider_select = $('#provider-select');
+    var url = provider_select.val();
+    var table_body = table.find('tbody');
+    var last_row = table_body.find('tr:last');
+
+    $.ajax({
+      url: url,
+      data: {
+        accept: dialog.data('ev-state').opts.accept,
+        context: dialog.data('ev-state').opts.context,
+        page_token: page
+      }
+    }).done(function(data) {
+      var new_table = $(data);
+      var new_rows = $(new_table).find('tbody tr');
+      var new_table_foot = $(new_table).find('tfoot');
+
+      table.find('tfoot').replaceWith(new_table_foot);
+      table.treetable("loadBranch", null, new_rows);
+
+      last_row.focus();
+      sizeColumns(table);
+      indicateSelected();
+    }).fail(function(xhr,status,error) {
+      if(xhr.responseText.indexOf("Refresh token has expired") > -1) {
+        $('.ev-files').html("Your session has expired please clear your cookies.");
+      } else {
+        $('.ev-files').html(xhr.responseText);
+      }
+    }).always(function() {
+      stopWait();
+    });
+  };
+
+  // Handlers for DOM events
+
   $(window).on('resize', function () {
     return sizeColumns($('table#file-list'));
   });
@@ -354,19 +406,27 @@ $(function () {
   $(document).on('change', '.ev-providers select', function (event) {
     event.preventDefault();
     startWait();
+
+    var table_id = $(this).data('table-id');
+    var table = $(table_id);
+    var page = table.data('provider-contents-page-number');
+
     return $.ajax({
       url: $(this).val(),
       data: {
         accept: dialog.data('ev-state').opts.accept,
-        context: dialog.data('ev-state').opts.context
+        context: dialog.data('ev-state').opts.context,
+        page: page
       } }).done(function (data) {
       $('.ev-files').html(data);
+      $('.ev-files').off('scroll.browseEverything');
+      $('.ev-files').on('scroll.browseEverything', handleScroll);
       indicateSelected();
       $('#provider_auth').focus();
       return tableSetup($('table#file-list'));
     }).fail(function (xhr, status, error) {
       if (xhr.responseText.indexOf("Refresh token has expired") > -1) {
-        return $('.ev-files').html("Your sessison has expired please clear your cookies.");
+        return $('.ev-files').html("Your session has expired please clear your cookies.");
       } else {
         return $('.ev-files').html(xhr.responseText);
       }
