@@ -76,13 +76,17 @@ class BrowseEverythingController < ActionController::Base
 
   def resolve
     selected_files = params[:selected_files] || []
-    selected_links = selected_files.collect do |file|
+    selected_links = []
+    selected_files.each do |file|
       provider_key_value, uri = file.split(/:/)
       provider_key = provider_key_value.to_sym
-      (url, extra) = browser.providers[provider_key].link_for(uri)
-      result = { url: url }
-      result.merge!(extra) unless extra.nil?
-      result
+      values = browser.providers[provider_key].link_for(uri)
+      values.each do |value|
+        (url, extra) = value
+        result = { url: url }
+        result.merge!(extra) unless extra.nil?
+        selected_links << result
+      end
     end
 
     respond_to do |format|
