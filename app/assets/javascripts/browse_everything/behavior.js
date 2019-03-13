@@ -460,6 +460,19 @@ $(function () {
     return check_func();
   });
 
+  /**
+   * Determine if an element is a container (i. e. directory)
+   * {@param} element
+   * {@return} boolean
+   */
+  var isContainer = function (element) {
+    var $target = $(element);
+    var $td = $target.parent();
+    var classes = $td.attr('class').split(' ');
+
+    return classes.indexOf('ev-directory-select') != -1;
+  };
+
   $(document).on('change', 'input.ev-select-all', function (event) {
     event.stopPropagation();
     event.preventDefault();
@@ -467,16 +480,17 @@ $(function () {
     var action = this.value;
     var row = $(this).closest('tr');
     var node_id = row.find('td.ev-file-name a.ev-link').attr('href');
+    var $target = $(event.target);
+
     if (row.hasClass('collapsed')) {
-      var $target = $(event.currentTarget);
-      var $td = $target.parent();
-      var classes = $td.attr('class').split(' ');
-      if (classes.indexOf('ev-directory-select') != -1) {
-        return;
+      if (isContainer($target)) {
+        var $tr = $target.parents('tr');
+        return selectFile($tr);
       }
 
       return $('table#file-list').treetable('expandNode', node_id);
     } else {
+
       return selectChildRows(row, action);
     }
   });

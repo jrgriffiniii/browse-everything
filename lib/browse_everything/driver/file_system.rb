@@ -22,10 +22,26 @@ module BrowseEverything
         @sorter.call(@entries)
       end
 
+      # Retrieve an array of link attributes for a resource path
+      # @param path [String]
+      # @return [Array]
       def link_for(path)
         full_path = File.expand_path(path)
-        file_size = file_size(full_path)
-        ["file://#{full_path}", { file_name: File.basename(path), file_size: file_size }]
+
+        # Recurse if this is a directory
+        if File.directory?(full_path)
+          entries = []
+          Dir.entries(full_path).map do |file_path|
+            next if /^\.\.?$/.match(file_path)
+
+            full_file_path = File.join(full_path, file_path)
+            entries += link_for(full_file_path)
+          end
+          entries
+        else
+          file_size = file_size(full_path)
+          [["file://#{full_path}", { file_name: File.basename(path), file_size: file_size }]]
+        end
       end
 
       def authorized?
