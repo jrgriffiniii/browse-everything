@@ -394,7 +394,8 @@ $(function () {
     });
   });
 
-  $(document).on('click', '.ev-files .ev-container a.ev-link', function (event) {
+  //$(document).on('click', '.ev-files .ev-container a.ev-link', function (event) {
+  $(document).on('click', '.ev-files a.ev-link', function (event) {
     event.stopPropagation();
     event.preventDefault();
     var row = $(this).closest('tr');
@@ -467,6 +468,13 @@ $(function () {
     var row = $(this).closest('tr');
     var node_id = row.find('td.ev-file-name a.ev-link').attr('href');
     if (row.hasClass('collapsed')) {
+      var $target = $(event.currentTarget);
+      var $td = $target.parent();
+      var classes = $td.attr('class').split(' ');
+      if (classes.indexOf('ev-directory-select') != -1) {
+        return;
+      }
+
       return $('table#file-list').treetable('expandNode', node_id);
     } else {
       return selectChildRows(row, action);
