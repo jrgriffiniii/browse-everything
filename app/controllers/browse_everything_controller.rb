@@ -77,21 +77,39 @@ class BrowseEverythingController < ActionController::Base
   def resolve
     selected_files = params[:selected_files] || []
     selected_links = []
+    selected_directories = []
+    payload = {}
+    last_provider_key = nil
+
     selected_files.each do |file|
       provider_key_value, uri = file.split(/:/)
       provider_key = provider_key_value.to_sym
+
       values = browser.providers[provider_key].link_for(uri)
       values.each do |value|
         (url, extra) = value
         result = { url: url }
         result.merge!(extra) unless extra.nil?
-        selected_links << result
+        selected_links << result unless result.fetch(:directory, false)
+        selected_directories << result if result.fetch(:directory, false) && !selected_directories.include?(result)
       end
+
+      last_provider_key = provider_key
     end
+
+    selected_links.each_index do |index|
+      payload[index] = selected_files[index]
+    end
+
+    payload[:browse_everything] = {
+      selected_files: selected_links,
+      selected_directories: selected_directories
+    }
+    payload[:browse_everything][:provider] = last_provider_key unless selected_links.empty?
 
     respond_to do |format|
       format.html { render layout: false }
-      format.json { render json: selected_links }
+      format.json { render json: payload }
     end
   end
 
