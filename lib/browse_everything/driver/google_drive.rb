@@ -177,8 +177,8 @@ module BrowseEverything
         file = drive_service.get_file(id, fields: 'id, name, size, mimeType')
         if file.mime_type == 'application/vnd.google-apps.folder'
           entries = []
-          contents(file.id).map do |file|
-            entries += link_for(file.id)
+          contents(file.id).map do |drive_file|
+            entries += link_for(drive_file.id)
           end
           entries
         else
