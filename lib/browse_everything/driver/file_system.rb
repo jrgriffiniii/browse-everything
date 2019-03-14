@@ -33,15 +33,16 @@ module BrowseEverything
         if File.directory?(full_path)
           entries = []
           Dir.entries(full_path).map do |file_path|
-            next if /^\.\.?$/.match(file_path)
+            next if /^\.\.?$/ =~ file_path
 
+            entries << ["file://#{full_path}", { file_name: File.basename(full_path), file_size: 0, directory: true }]
             full_file_path = File.join(full_path, file_path)
             entries += link_for(full_file_path)
           end
           entries
         else
           file_size = file_size(full_path)
-          [["file://#{full_path}", { file_name: File.basename(path), file_size: file_size }]]
+          [["file://#{full_path}", { file_name: File.basename(path), file_size: file_size, directory: false }]]
         end
       end
 

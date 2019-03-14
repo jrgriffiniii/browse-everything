@@ -1,8 +1,110 @@
 'use strict';
 
+/**
+ * Class for interacting with the form element
+ * @param form {Element|jQuery}
+ */
+function BrowseEverythingForm(form) {
+  this.form = form;
+  this.$form = $(form);
+};
+
+/**
+ * Append a hidden <input> element to the form for a file entry (legacy)
+ * @param value {string}
+ */
+BrowseEverythingForm.prototype.appendLegacyFileInputElement = function(value) {
+  var hidden_input = $("<input type='hidden' class='ev-url' name='selected_files[]'/>").val(value);
+  this.$form.append(hidden_input);
+};
+
+/**
+ * Append a hidden <input> element for the form for a file entry
+ * @param value {string}
+ */
+BrowseEverythingForm.prototype.appendFileInputElement = function(value) {
+  var hidden_input = $("<input type='hidden' class='ev-url' name='browse_everything[selected_files][]'/>").val(value);
+  this.$form.append(hidden_input);
+};
+
+/**
+ * Append a hidden <input> element for the form for a directory entry
+ * @param value {string}
+ */
+BrowseEverythingForm.prototype.appendDirectoryInputElement = function(value) {
+  var hidden_input = $("<input type='hidden' class='ev-url' name='browse_everything[selected_directories][]'/>").val(value);
+  this.$form.append(hidden_input);
+};
+
+/**
+ * Remove all hidden <input> elements for file or directory entries on the form
+ * @param value {string}
+ */
+BrowseEverythingForm.prototype.removeFileInputElements = function(value) {
+  this.$form.find('input[type="hidden"][value="' + file_location + '"]').remove();
+};
+
+/**
+ * Class for resources selected for upload
+ * @param element {Element|jQuery}
+ */
+function BrowseEverythingResource(element) {
+  this.element = element;
+  this.$element = $(element);
+};
+
+/*
+ * Retrieve the location URI for the file resource
+ * @return {string}
+ */
+BrowseEverythingResource.prototype.getLocation = function () {
+  return this.$element.data('ev-location');
+};
+
+/*
+ * Static factory method for building objects
+ * @param element {Element|jQuery}
+ * @return {BrowseEverythingDirectory|BrowseEverythingFile}
+ */
+BrowseEverythingResource.build = function(element) {
+  var $element = element;
+  if ($element.data('tt-branch')) {
+    return new BrowseEverythingDirectory(element);
+  }
+
+  return new BrowseEverythingFile(element);
+}
+
+/*
+ * Class for file uploads
+ * @param element {Element|jQuery}
+ */
+function BrowseEverythingFile(element) {
+  BrowseEverythingResource.call(this, element);
+};
+BrowseEverythingFile.prototype = Object.create(BrowseEverythingResource.prototype);
+BrowseEverythingFile.prototype.constructor = BrowseEverythingFile;
+
+/*
+ * Class for directory uploads
+ * @param element {Element|jQuery}
+ */
+function BrowseEverythingDirectory(element) {
+  BrowseEverythingResource.call(this, element);
+};
+BrowseEverythingDirectory.prototype = Object.create(BrowseEverythingResource.prototype);
+BrowseEverythingDirectory.prototype.constructor = BrowseEverythingDirectory;
+
+// Initial the global values and bind them to the global scope
+window.browseEverything = {
+  form: null
+};
+
+/**
+ * jQuery-bound functionality
+ */
 $(function () {
   var dialog = $('div#browse-everything');
-
   var initialize = function initialize(obj, options) {
     if ($('div#browse-everything').length === 0) {
       // bootstrap 4 needs at least the inner class="modal-dialog" div, or it gets really
@@ -78,19 +180,25 @@ $(function () {
   };
 
   var selectFile = function selectFile(row) {
-    var target_form = $('form.ev-submit-form');
-    var file_location = row.data('ev-location');
-    var hidden_input = $("<input type='hidden' class='ev-url' name='selected_files[]'/>").val(file_location);
-    target_form.append(hidden_input);
+    var resource = BrowseEverythingResource.build(row);
+    window.browseEverything.form.appendLegacyFileInputElement(resource.getLocation());
+
+    // Support the new API
+    if (resource instanceof BrowseEverythingDirectory) {
+      window.browseEverything.form.appendDirectoryInputElement(resource.getLocation());
+    } else {
+      window.browseEverything.form.appendFileInputElement(resource.getLocation());
+    }
+
     if (!$(row).find('.ev-select-file').prop('checked')) {
       return $(row).find('.ev-select-file').prop('checked', true);
     }
   };
 
   var unselectFile = function unselectFile(row) {
-    var target_form = $('form.ev-submit-form');
-    var file_location = row.data('ev-location');
-    $('form.ev-submit-form input[value=\'' + file_location + '\']').remove();
+    var resource = BrowseEverythingResource.build(row);
+    window.browseEverything.form.removeFileInputElements(resource.getLocation());
+
     if ($(row).find('.ev-select-file').prop('checked')) {
       return $(row).find('.ev-select-file').prop('checked', false);
     }
@@ -215,7 +323,8 @@ $(function () {
         parent: node.row.data('tt-id'),
         accept: dialog.data('ev-state').opts.accept,
         context: dialog.data('ev-state').opts.context
-      } }).done(function (html) {
+      }
+    }).done(function (html) {
       setProgress('100');
       clearInterval(progressIntervalID);
       var rows = $('tbody tr', $(html));
@@ -307,7 +416,6 @@ $(function () {
   };
 
   // Handlers for DOM events
-
   $(window).on('resize', function () {
     return sizeColumns($('table#file-list'));
   });
@@ -324,7 +432,10 @@ $(function () {
         return dialog.load(ctx.opts.route, function () {
           setTimeout(refreshFiles, 500);
           ctx.callbacks.show.fire();
-          return dialog.modal('show');
+          var $dialog = dialog.modal('show');
+          var $form = $('form.ev-submit-form');
+          window.browseEverything.form = new BrowseEverythingForm($form);
+          return $dialog;
         });
       });
     }
@@ -394,7 +505,6 @@ $(function () {
     });
   });
 
-  //$(document).on('click', '.ev-files .ev-container a.ev-link', function (event) {
   $(document).on('click', '.ev-files a.ev-link', function (event) {
     event.stopPropagation();
     event.preventDefault();
@@ -462,8 +572,8 @@ $(function () {
 
   /**
    * Determine if an element is a container (i. e. directory)
-   * {@param} element
-   * {@return} boolean
+   * @param element {Element|jQuery}
+   * @return {boolean}
    */
   var isContainer = function (element) {
     var $target = $(element);
@@ -483,6 +593,7 @@ $(function () {
     var $target = $(event.target);
 
     if (row.hasClass('collapsed')) {
+      // Replace this BrowseEverythingResource type inferencing
       if (isContainer($target)) {
         var $tr = $target.parents('tr');
         return selectFile($tr);
