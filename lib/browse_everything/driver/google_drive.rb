@@ -174,15 +174,23 @@ module BrowseEverything
       # @param id [String] identifier for the resource
       # @return [Array<String, Hash>] authorized link to the resource
       def link_for(id)
-        file = drive_service.get_file(id, fields: 'id, name, size')
-        auth_header = { 'Authorization' => "Bearer #{credentials.access_token}" }
-        extras = {
-          auth_header: auth_header,
-          expires: 1.hour.from_now,
-          file_name: file.name,
-          file_size: file.size.to_i
-        }
-        [download_url(id), extras]
+        file = drive_service.get_file(id, fields: 'id, name, size, mimeType')
+        if file.mime_type == 'application/vnd.google-apps.folder'
+          entries = []
+          contents(file.id).map do |file|
+            entries += link_for(file.id)
+          end
+          entries
+        else
+          auth_header = { 'Authorization' => "Bearer #{credentials.access_token}" }
+          extras = {
+            auth_header: auth_header,
+            expires: 1.hour.from_now,
+            file_name: file.name,
+            file_size: file.size.to_i
+          }
+          [[download_url(id), extras]]
+        end
       end
 
       # Provides a URL for authorizing against Google Drive
