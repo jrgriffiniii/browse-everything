@@ -126,19 +126,22 @@ class BrowseEverythingController < ActionController::Base
     # Accesses the relative path for browsing from the Rails session
     # @return [String]
     def browse_path
-      params[:path] || ''
+      params.fetch(:path, '')
     end
 
     # Generate the provider name from the Rails session state value
     # @return [String]
     def provider_name_from_state
-      params[:state].to_s.split(/\|/).last
+      state_value = params[:state]
+      state_components = state_value.to_s.split(/\|/)
+      state_components.last
     end
 
     # Generates the name of the provider using Rails session values
     # @return [String]
     def provider_name
-      params[:provider] || provider_name_from_state || browser.providers.each_key.to_a.first
+      value = params[:provider] || provider_name_from_state || browser.providers.each_key.to_a.first
+      session[:provider] = value
     end
 
     # Constructs a browser manager Object
@@ -149,8 +152,13 @@ class BrowseEverythingController < ActionController::Base
       BrowserFactory.build(session: session, url_options: url_options)
     end
 
+    # Retrieves a cached provider, or, defaults to the first configured provider
+    # @return [BrowseEverything::Driver::Base]
     def build_provider
-      browser.providers[provider_name.to_sym] || browser.first_provider
+      provider_key = provider_name.to_sym
+      return browser.providers[provider_key] if browser.providers.key?(provider_key)
+
+      browser.first_provider
     end
 
     # Retrieve the Driver for each request
