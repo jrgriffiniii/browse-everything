@@ -13,7 +13,7 @@
       <div class="ev-browser row" aria-live="polite">
         <%# col-xs-12 is bootstrap3, col-12 is bootstrap4 %>
         <div class="col-xs-12 col-12 ev-files list">
-          <% if provider.present? %>
+          <% if provider.present? && current_provider?(provider) %>
             <% if provider.authorized? %>
               <%= render :partial => 'files' %>
             <% else %>
