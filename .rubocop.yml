@@ -20,10 +20,6 @@ Rails/HttpPositionalArguments:
 Metrics/AbcSize:
   Exclude:
     - 'app/controllers/browse_everything_controller.rb'
-Metrics/ClassLength:
-  Max: 130
-  Exclude:
-    - 'lib/browse_everything/driver/google_drive.rb'
 Metrics/LineLength:
   Max: 400
   Exclude:
