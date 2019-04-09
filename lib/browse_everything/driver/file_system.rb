@@ -32,7 +32,9 @@ module BrowseEverything
         # Recurse if this is a directory
         if File.directory?(full_path)
           entries = []
-          Dir.entries(full_path).map do |file_path|
+          directory_entries = Dir.entries(full_path)
+
+          directory_entries.sort.map do |file_path|
             next if /^\.\.?$/ =~ file_path
 
             entries << ["file://#{full_path}", { file_name: File.basename(full_path), file_size: 0, directory: true }]
@@ -74,12 +76,15 @@ module BrowseEverything
         # @param real_path [String] path to the file system directory
         # @return [Array<BrowseEverything::FileEntry>]
         def make_directory_entry(real_path)
-          entries = []
-          entries + Dir[File.join(real_path, '*')].collect { |f| details(f) }
+          pattern = File.join(real_path, '*')
+          Dir[pattern].collect { |f| details(f) }
         end
 
         def make_pathname(path)
-          Pathname.new(File.expand_path(path)).relative_path_from(Pathname.new(config[:home]))
+          home_path = Pathname.new(config[:home])
+          expanded = File.expand_path(path)
+          file_entry_path = Pathname.new(expanded)
+          file_entry_path.relative_path_from(home_path)
         end
 
         def file_size(path)

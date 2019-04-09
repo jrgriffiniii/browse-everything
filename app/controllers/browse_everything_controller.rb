@@ -75,7 +75,7 @@ class BrowseEverythingController < ActionController::Base
   end
 
   def resolve
-    selected_files = params[:selected_files] || []
+    selected_files = browse_everything_params || selected_params || []
     selected_links = []
     selected_directories = []
     payload = {}
@@ -187,6 +187,20 @@ class BrowseEverythingController < ActionController::Base
     # @return [BrowseEverything::Driver::Base]
     def provider
       @provider ||= build_provider
+    end
+
+    # Retrieve the file and directory entries selected using the POST request
+    # @return [Array<String>]
+    def browse_everything_params
+      return unless params[:browse_everything]
+
+      params[:browse_everything].fetch(:selected_files, []) + params[:browse_everything].fetch(:selected_directories, [])
+    end
+
+    # Retrieve the file entries selected using the legacy POST request parameter
+    # @return [Array<String>]
+    def selected_params
+      params[:selected_files]
     end
 
     helper_method :auth_link
