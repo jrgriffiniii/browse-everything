@@ -40,7 +40,7 @@ BrowseEverythingForm.prototype.appendDirectoryInputElement = function(value) {
  * Remove all hidden <input> elements for file or directory entries on the form
  * @param value {string}
  */
-BrowseEverythingForm.prototype.removeFileInputElements = function(value) {
+BrowseEverythingForm.prototype.removeFileInputElements = function(file_location) {
   this.$form.find('input[type="hidden"][value="' + file_location + '"]').remove();
 };
 
@@ -181,7 +181,6 @@ $(function () {
 
   var selectFile = function selectFile(row) {
     var resource = BrowseEverythingResource.build(row);
-    window.browseEverything.form.appendLegacyFileInputElement(resource.getLocation());
 
     // Support the new API
     if (resource instanceof BrowseEverythingDirectory) {
