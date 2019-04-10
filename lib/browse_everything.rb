@@ -8,6 +8,7 @@ require 'browse_everything/retriever'
 module BrowseEverything
   autoload :Browser,   'browse_everything/browser'
   autoload :FileEntry, 'browse_everything/file_entry'
+  autoload :Resource, 'browse_everything/resource'
 
   module Driver
     module Paginator
