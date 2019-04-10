@@ -141,9 +141,10 @@ RSpec.describe BrowseEverythingController, type: :controller do
       json_response = JSON.parse(response.body)
       expect(json_response).not_to be_empty
       resolved = json_response.first
-      expect(resolved).to include 'url' => 'file:///my/test/file.txt'
-      expect(resolved).to include 'file_name' => 'file.txt'
-      expect(resolved).to include 'file_size' => 0
+      expect(resolved).to include "directory" => false
+      expect(resolved).to include "file_name" => "file.txt"
+      expect(resolved).to include "file_size" => 0
+      expect(resolved).to include "url" => "file:///my/test/file.txt"
     end
   end
 end

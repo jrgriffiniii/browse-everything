@@ -5,6 +5,7 @@ require File.expand_path('../helpers/browse_everything_helper', __dir__)
 class BrowseEverythingController < ActionController::Base
   layout 'browse_everything'
   helper BrowseEverythingHelper
+  include BrowseEverything::Parameters
 
   protect_from_forgery with: :exception
 
@@ -97,15 +98,7 @@ class BrowseEverythingController < ActionController::Base
       last_provider_key = provider_key
     end
 
-    selected_links.each_index do |index|
-      payload[index] = selected_files[index]
-    end
-
-    payload[:browse_everything] = {
-      selected_files: selected_links,
-      selected_directories: selected_directories
-    }
-    payload[:browse_everything][:provider] = last_provider_key unless selected_links.empty?
+    payload = selected_links
 
     respond_to do |format|
       format.html { render layout: false }
@@ -187,20 +180,6 @@ class BrowseEverythingController < ActionController::Base
     # @return [BrowseEverything::Driver::Base]
     def provider
       @provider ||= build_provider
-    end
-
-    # Retrieve the file and directory entries selected using the POST request
-    # @return [Array<String>]
-    def browse_everything_params
-      return unless params[:browse_everything]
-
-      params[:browse_everything].fetch(:selected_files, []) + params[:browse_everything].fetch(:selected_directories, [])
-    end
-
-    # Retrieve the file entries selected using the legacy POST request parameter
-    # @return [Array<String>]
-    def selected_params
-      params[:selected_files]
     end
 
     helper_method :auth_link
