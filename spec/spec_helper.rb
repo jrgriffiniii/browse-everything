@@ -80,7 +80,8 @@ module BrowserConfigHelper
                                's3' => {
                                  client_id: 'S3AppKey',
                                  client_secret: 'S3AppSecret',
-                                 bucket: 's3.bucket'
+                                 bucket: 's3.bucket',
+                                 region: 'us-east-1'
                                })
   end
 

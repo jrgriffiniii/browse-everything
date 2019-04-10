@@ -37,13 +37,13 @@ module BrowseEverything
       # @param [String] id of the file or folder in Box
       # @return [Array<RubyBox::File>]
       def contents(id = '', _page_index = 0)
-        if id.empty?
-          folder = box_client.root_folder
-          @entries = []
-        else
-          folder = box_client.folder_by_id(id)
-          @entries = [parent_directory(folder)]
-        end
+        @entries = []
+
+        folder = if id.empty?
+                   box_client.root_folder
+                 else
+                   box_client.folder_by_id(id)
+                 end
 
         folder.items(ITEM_LIMIT, 0, %w[name size created_at]).collect do |f|
           values << directory_entry(f)
