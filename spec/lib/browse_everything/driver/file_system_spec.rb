@@ -95,6 +95,10 @@ describe BrowseEverything::Driver::FileSystem do
   describe "#link_for('/path/to/file')" do
     subject { provider.link_for('/path/to/file') }
 
-    it { is_expected.to eq(['file:///path/to/file', { file_name: 'file', file_size: 0 }]) }
+    it {
+      is_expected.to eq([
+                          ['file:///path/to/file', { directory: false, file_name: 'file', file_size: 0 }]
+                        ])
+    }
   end
 end

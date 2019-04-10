@@ -194,7 +194,7 @@ describe BrowseEverything::Driver::GoogleDrive do
     end
 
     describe '#link_for' do
-      subject(:link) { driver.link_for('asset-id2') }
+      subject(:links) { driver.link_for('asset-id2') }
       let(:file_response_body) do
         '{
          "id": "asset-id2",
@@ -205,7 +205,7 @@ describe BrowseEverything::Driver::GoogleDrive do
 
       before do
         stub_request(
-          :get, "https://www.googleapis.com/drive/v3/files/asset-id2?fields=id,%20name,%20size"
+          :get, "https://www.googleapis.com/drive/v3/files/asset-id2?fields=id,%20name,%20size,%20mimeType"
         ).to_return(
           body: file_response_body,
           status: 200,
@@ -216,6 +216,9 @@ describe BrowseEverything::Driver::GoogleDrive do
       end
 
       it 'generates the link for a Google Drive asset' do
+        expect(links).to be_an Array
+        expect(links.length).to eq 1
+        link = links.first
         expect(link).to be_an Array
         expect(link.first).to eq 'https://www.googleapis.com/drive/v3/files/asset-id2?alt=media'
         expect(link.last).to be_a Hash
