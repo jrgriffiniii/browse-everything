@@ -43,7 +43,7 @@ require 'chromedriver-helper'
 Dir[Pathname.new(File.expand_path('support/**/*.rb', __dir__))].each { |f| require f }
 
 require 'webmock/rspec'
-WebMock.disable_net_connect!(allow_localhost: true)
+WebMock.disable_net_connect!(allow_localhost: true, allow: "chromedriver.storage.googleapis.com")
 
 RSpec.configure do |config|
   config.expect_with :rspec do |c|
