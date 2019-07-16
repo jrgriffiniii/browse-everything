@@ -34,7 +34,8 @@ module BrowseEverything
         return [] unless selected_params
 
         values = selected_params.values.uniq
-        values.map { |value| BrowseEverything::Resource.new(value) }
+        selected_resources = values.map { |value| BrowseEverything::Resource.new(value) }
+        selected_resources.reject(&:hidden?)
       end
 
       # Determine whether or not cloud service files are being uploaded

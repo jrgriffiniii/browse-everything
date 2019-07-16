@@ -45,6 +45,7 @@ module BrowseEverything
                    box_client.folder_by_id(id)
                  end
 
+        values = []
         folder.items(ITEM_LIMIT, 0, %w[name size created_at]).collect do |f|
           values << directory_entry(f)
         end

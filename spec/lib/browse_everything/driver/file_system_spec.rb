@@ -55,6 +55,14 @@ describe BrowseEverything::Driver::FileSystem do
         its(:type)     { is_expected.to eq('application/pdf') }
         specify        { is_expected.not_to be_container }
       end
+
+      context 'when there is a hidden file' do
+        it 'does not retrieve the file path' do
+          expect(contents.length).to eq 4
+          file_entry_names = contents.map(&:name)
+          expect(file_entry_names).not_to include '.hidden.txt'
+        end
+      end
     end
 
     context 'when there is a subdirectory' do

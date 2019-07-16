@@ -12,13 +12,18 @@ module BrowseEverything
       uri
     end
 
+    def file?
+      url =~ /^file\:/
+    end
+
     # Determine whether or not this file is a cloud resource
     # @return [Boolean]
     def cloud_file?
-      return false if url.nil?
+      url =~ /^https?\:/
+    end
 
-      m = /^https?\:/.match(url)
-      !m.nil?
+    def hidden?
+      file? && path =~ /^\./
     end
 
     private
