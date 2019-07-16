@@ -43,6 +43,7 @@ module BrowseEverything
           end
           entries
         else
+          return [] if hidden?(full_path)
           file_size = file_size(full_path)
           [["file://#{full_path}", { file_name: File.basename(path), file_size: file_size, directory: false }]]
         end
@@ -57,7 +58,7 @@ module BrowseEverything
       # @param display [String] display label for the resource
       # @return [BrowseEverything::FileEntry]
       def details(path, display = File.basename(path))
-        return nil unless File.exist? path
+        return unless File.exist?(path)
         info = File::Stat.new(path)
         BrowseEverything::FileEntry.new(
           make_pathname(path),
@@ -77,7 +78,7 @@ module BrowseEverything
         # @return [Array<BrowseEverything::FileEntry>]
         def make_directory_entry(real_path)
           pattern = File.join(real_path, '*')
-          Dir[pattern].collect { |f| details(f) }
+          Dir.glob(pattern).collect { |f| details(f) }
         end
 
         def make_pathname(path)
@@ -92,6 +93,13 @@ module BrowseEverything
         rescue StandardError => error
           Rails.logger.error "Failed to find the file size for #{path}: #{error}"
           0
+        end
+
+        # Determines whether or not a file entry is hidden
+        # @param [String] path
+        # @return [Boolean]
+        def hidden?(path)
+          path =~ /^\..+/
         end
     end
   end
