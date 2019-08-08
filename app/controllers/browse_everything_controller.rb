@@ -76,6 +76,7 @@ class BrowseEverythingController < ActionController::Base
   end
 
   def resolve
+    # This needs to just pass URLs
     selected_files = browse_everything_params || selected_params || []
     selected_links = []
     selected_directories = []
@@ -83,10 +84,12 @@ class BrowseEverythingController < ActionController::Base
     last_provider_key = nil
 
     selected_files.each do |file|
-      provider_key_value, uri = file.split(/:/)
+      binding.pry
+      location = file[:location]
+      provider_key_value, id = location.split(/:/)
       provider_key = provider_key_value.to_sym
 
-      values = browser.providers[provider_key].link_for(uri)
+      values = browser.providers[provider_key].link_for(id, file[:name], file[:size])
       values.each do |value|
         (url, extra) = value
         result = { url: url }

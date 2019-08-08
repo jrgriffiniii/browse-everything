@@ -37,6 +37,24 @@ module BrowseEverythingHelper
     provider.key.to_sym == current_provider_key
   end
 
+  def max_size
+    return unless provider.config[:max_upload_file_size]
+
+    # This should be shifted into the Driver::Base Class
+    # provider.max_size
+    provider.config[:max_upload_file_size].to_i
+  end
+
+  def disabled?(file:)
+    return false if file.container? || max_size.blank?
+
+    file.size > max_size
+  end
+
+  def parent
+    params[:parent]
+  end
+
   private
 
     # Find the current provider stored in the session

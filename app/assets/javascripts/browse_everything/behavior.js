@@ -10,29 +10,30 @@ function BrowseEverythingForm(form) {
 };
 
 /**
- * Append a hidden <input> element to the form for a file entry (legacy)
- * @param value {string}
- */
-BrowseEverythingForm.prototype.appendLegacyFileInputElement = function(value) {
-  var hidden_input = $("<input type='hidden' class='ev-url' name='selected_files[]'/>").val(value);
-  this.$form.append(hidden_input);
-};
-
-/**
  * Append a hidden <input> element for the form for a file entry
- * @param value {string}
+ * @param resource {BrowseEverythingResource}
  */
-BrowseEverythingForm.prototype.appendFileInputElement = function(value) {
-  var hidden_input = $("<input type='hidden' class='ev-url' name='browse_everything[selected_files][]'/>").val(value);
+BrowseEverythingForm.prototype.appendFileInputElement = function(resource) {
+  // Add the location
+  var hidden_input = $("<input type='hidden' class='ev-url' name='browse_everything[selected_files][][location]'/>").val(resource.getLocation());
   this.$form.append(hidden_input);
+
+  // Add the name
+  var hidden_input = $("<input type='hidden' class='ev-url' name='browse_everything[selected_files][][name]'/>").val(resource.getName());
+  this.$form.append(hidden_input);
+
+  // Add the size
+  var hidden_input = $("<input type='hidden' class='ev-url' name='browse_everything[selected_files][][size]'/>").val(resource.getSize());
+  this.$form.append(hidden_input);
+
 };
 
 /**
  * Append a hidden <input> element for the form for a directory entry
- * @param value {string}
+ * @param resource {BrowseEverythingResource}
  */
-BrowseEverythingForm.prototype.appendDirectoryInputElement = function(value) {
-  var hidden_input = $("<input type='hidden' class='ev-url' name='browse_everything[selected_directories][]'/>").val(value);
+BrowseEverythingForm.prototype.appendDirectoryInputElement = function(resource) {
+  var hidden_input = $("<input type='hidden' class='ev-url' name='browse_everything[selected_directories][][location]'/>").val(resource.getLocation());
   this.$form.append(hidden_input);
 };
 
@@ -184,9 +185,9 @@ $(function () {
 
     // Support the new API
     if (resource instanceof BrowseEverythingDirectory) {
-      window.browseEverything.form.appendDirectoryInputElement(resource.getLocation());
+      window.browseEverything.form.appendDirectoryInputElements(resource);
     } else {
-      window.browseEverything.form.appendFileInputElement(resource.getLocation());
+      window.browseEverything.form.appendFileInputElements(resource);
     }
 
     if (!$(row).find('.ev-select-file').prop('checked')) {

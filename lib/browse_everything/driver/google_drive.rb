@@ -173,7 +173,17 @@ module BrowseEverything
       # Retrieve a link for a resource
       # @param id [String] identifier for the resource
       # @return [Array<String, Hash>] authorized link to the resource
-      def link_for(id)
+      def link_for(id, file_name = '', file_size = 0)
+        # This should be all that is needed
+        auth_header = { 'Authorization' => "Bearer #{credentials.access_token}" }
+        extras = {
+          auth_header: auth_header,
+          expires: 1.hour.from_now,
+          file_name: file_name,
+          file_size: file_size
+        }
+        return [[download_url(id), extras]]
+
         file = drive_service.get_file(id, fields: 'id, name, size, mimeType')
         if file.mime_type == 'application/vnd.google-apps.folder'
           entries = []
@@ -296,6 +306,7 @@ module BrowseEverything
         end
 
         # Provides the user ID for caching access tokens
+        # 
         # (This is a hack which attempts to anonymize the access tokens)
         # @return [String] the ID for the user
         def user_id
