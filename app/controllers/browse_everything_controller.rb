@@ -166,7 +166,7 @@ class BrowseEverythingController < ActionController::Base
     # Hence, a Browser must be reinstantiated for each request using the state provided in the Rails session
     # @return [BrowseEverything::Browser]
     def browser
-      BrowserFactory.build(session: session, url_options: url_options)
+      BrowseEverything.current_browser = BrowserFactory.build(session: session, url_options: url_options)
     end
 
     # Retrieves a cached provider, or, defaults to the first configured provider

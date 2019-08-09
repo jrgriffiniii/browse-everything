@@ -5,16 +5,18 @@ module BrowseEverything
     attr_reader :providers
 
     def initialize(opts = {})
-      url_options = {}
+      config = BrowseEverything.config
+
       if opts.key?(:url_options)
         url_options = opts.delete(:url_options)
+        config.merge(opts)
       else
         url_options = opts
-        opts = BrowseEverything.config
       end
 
       @providers = ActiveSupport::HashWithIndifferentAccess.new
-      opts.each_pair do |driver_key, config|
+      # This iterates through the configuration for each provider
+      config.each_pair do |driver_key, config|
         begin
           driver = driver_key.to_s
           driver_klass = BrowseEverything::Driver.const_get((config[:driver] || driver).camelize.to_sym)

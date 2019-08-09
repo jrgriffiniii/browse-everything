@@ -29,7 +29,7 @@
           data-ev-file-size="<%= file.size %>"
           data-ev-file-date="<%= file.mtime %>"
           <%= file.container? ? 'data-ev-container' : '' %>
-          data-ev-provider="<%= file.provider %>"
+          data-ev-provider="<%= file.provider_name %>"
           data-tt-id="<%= path %>"
           data-tt-parent-id="<%= parent %>"
           data-tt-branch="<%= file.container? ? 'true' : 'false' %>">

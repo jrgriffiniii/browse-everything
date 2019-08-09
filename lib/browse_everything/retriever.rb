@@ -69,6 +69,11 @@ module BrowseEverything
       BrowserFactory.for(name: name)
     end
 
+    def attributes(file_entry, access_token)
+      provider = build_provider(file_entry.provider_name)
+      provider.attributes_for(file_entry, access_token)
+    end
+
     # Retrieve the resources for directory or container resource
     # @param spec [Hash] structure containing the download for the asset
     # @return [Array<BrowseEverything::FileEntry>]
@@ -90,7 +95,7 @@ module BrowseEverything
       member_entries = contents(container_attributes, access_token)
       members = []
       member_entries.each do |file_entry|
-        provider = build_provider(file_entry.provider)
+        provider = build_provider(file_entry.provider_name)
         member_attributes = provider.attributes_for(file_entry, access_token)
         if file_entry.container?
           members += member_resources(member_attributes, access_token)

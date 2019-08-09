@@ -2,9 +2,9 @@
 
 module BrowseEverything
   class FileEntry
-    attr_reader :id, :location, :name, :size, :mtime, :type, :provider
+    attr_reader :id, :location, :name, :size, :mtime, :type, :provider_name
 
-    def initialize(id, location, name, size, mtime, container, type = nil, provider = nil)
+    def initialize(id, location, name, size, mtime, container, type = nil, provider_name = nil)
       @id        = id
       @location  = location
       @name      = name
@@ -12,7 +12,7 @@ module BrowseEverything
       @mtime     = mtime
       @container = container
       @type      = type || (@container ? 'application/x-directory' : Rack::Mime.mime_type(File.extname(name)))
-      @provider  = provider
+      @provider_name = provider_name
     end
 
     def relative_parent_path?
@@ -23,8 +23,12 @@ module BrowseEverything
       @container
     end
 
+    def provider
+      @provider ||= BrowserFactory.for(name: provider_name)
+    end
+
     def url
-      "foo/bar"
+      provider.download_url(id)
     end
   end
 end
