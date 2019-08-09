@@ -120,7 +120,8 @@ module BrowseEverything
           file.size.to_i,
           file.modified_time || Time.new,
           mime_folder,
-          mime_folder ? 'directory' : file.mime_type
+          mime_folder ? 'directory' : file.mime_type,
+          'google_drive'
         )
       end
 
@@ -156,7 +157,7 @@ module BrowseEverything
       # Retrieve the files for any given resource on Google Drive
       # @param path [String] the root or Folder path for which to list contents
       # @return [Array<BrowseEverything::FileEntry>] file entries for the path
-      def contents(path = '', page_token = nil)
+      def contents(path = '', page_token = nil, access_token = nil)
         # Return the cached response if its been indexed into memory
         pages = pages_for_path(path)
         return pages[page_token] if pages.indexed? page_token
@@ -164,23 +165,44 @@ module BrowseEverything
         request_params = Auth::Google::RequestParameters.new
         request_params.q += " and '#{path}' in parents " if path.present?
 
+        restore_credentials(access_token) if @credentials.nil?
         list_files(drive_service, request_params, path: path, page_token: page_token)
 
         page_index = page_token || pagination_klass::FIRST_PAGE_TOKEN
         pages[page_index]
       end
 
+      def attributes_for(file_entry, access_token = nil)
+        access_token = credentials.access_token if access_token.nil?
+        auth_header = { 'Authorization' => "Bearer #{access_token}" }
+
+        file_entry_url = download_url(file_entry.id)
+        {
+          id: file_entry.id,
+          url: file_entry_url,
+          auth_header: auth_header,
+          file_name: file_entry.name,
+          file_size: file_entry.size,
+          container: file_entry.container?,
+          provider: file_entry.provider
+        }
+      end
+
       # Retrieve a link for a resource
       # @param id [String] identifier for the resource
       # @return [Array<String, Hash>] authorized link to the resource
-      def link_for(id, file_name = '', file_size = 0)
+      def link_for(id, file_name = '', file_size = 0, container = false, access_token = nil)
         # This should be all that is needed
-        auth_header = { 'Authorization' => "Bearer #{credentials.access_token}" }
+        access_token = credentials.access_token if access_token.nil?
+        auth_header = { 'Authorization' => "Bearer #{access_token}" }
         extras = {
+          id: id,
           auth_header: auth_header,
           expires: 1.hour.from_now,
           file_name: file_name,
-          file_size: file_size
+          file_size: file_size,
+          container: container,
+          provider: :google_drive
         }
         return [[download_url(id), extras]]
 

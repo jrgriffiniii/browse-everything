@@ -84,12 +84,11 @@ class BrowseEverythingController < ActionController::Base
     last_provider_key = nil
 
     selected_files.each do |file|
-      binding.pry
       location = file[:location]
       provider_key_value, id = location.split(/:/)
       provider_key = provider_key_value.to_sym
 
-      values = browser.providers[provider_key].link_for(id, file[:name], file[:size])
+      values = browser.providers[provider_key].link_for(id, file[:name], file[:size], file[:container] == "true")
       values.each do |value|
         (url, extra) = value
         result = { url: url }

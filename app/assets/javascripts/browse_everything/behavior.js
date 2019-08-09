@@ -13,28 +13,44 @@ function BrowseEverythingForm(form) {
  * Append a hidden <input> element for the form for a file entry
  * @param resource {BrowseEverythingResource}
  */
-BrowseEverythingForm.prototype.appendFileInputElement = function(resource) {
+BrowseEverythingForm.prototype.appendFileInputElements = function(resource) {
   // Add the location
-  var hidden_input = $("<input type='hidden' class='ev-url' name='browse_everything[selected_files][][location]'/>").val(resource.getLocation());
-  this.$form.append(hidden_input);
+  var location_input = $("<input type='hidden' class='ev-url' name='browse_everything[selected_files][][location]'/>").val(resource.getLocation());
+  this.$form.append(location_input);
 
   // Add the name
-  var hidden_input = $("<input type='hidden' class='ev-url' name='browse_everything[selected_files][][name]'/>").val(resource.getName());
-  this.$form.append(hidden_input);
+  var name_input = $("<input type='hidden' class='ev-url' name='browse_everything[selected_files][][name]'/>").val(resource.getName());
+  this.$form.append(name_input);
 
   // Add the size
-  var hidden_input = $("<input type='hidden' class='ev-url' name='browse_everything[selected_files][][size]'/>").val(resource.getSize());
-  this.$form.append(hidden_input);
+  var size_input = $("<input type='hidden' class='ev-url' name='browse_everything[selected_files][][size]'/>").val(resource.getSize());
+  this.$form.append(size_input);
 
+  // Add the type
+  var type_input = $("<input type='hidden' class='ev-url' name='browse_everything[selected_files][][container]'/>").val(false);
+  this.$form.append(type_input);
 };
 
 /**
  * Append a hidden <input> element for the form for a directory entry
  * @param resource {BrowseEverythingResource}
  */
-BrowseEverythingForm.prototype.appendDirectoryInputElement = function(resource) {
-  var hidden_input = $("<input type='hidden' class='ev-url' name='browse_everything[selected_directories][][location]'/>").val(resource.getLocation());
-  this.$form.append(hidden_input);
+BrowseEverythingForm.prototype.appendDirectoryInputElements = function(resource) {
+  // Add the location
+  var location_input = $("<input type='hidden' class='ev-url' name='browse_everything[selected_directories][][location]'/>").val(resource.getLocation());
+  this.$form.append(location_input);
+
+  // Add the name
+  var name_input = $("<input type='hidden' class='ev-url' name='browse_everything[selected_directories][][name]'/>").val(resource.getName());
+  this.$form.append(name_input);
+
+  // Add the size
+  var size_input = $("<input type='hidden' class='ev-url' name='browse_everything[selected_directories][][size]'/>").val(resource.getSize());
+  this.$form.append(size_input);
+
+  // Add the type
+  var type_input = $("<input type='hidden' class='ev-url' name='browse_everything[selected_directories][][container]'/>").val(true);
+  this.$form.append(type_input);
 };
 
 /**
@@ -60,6 +76,22 @@ function BrowseEverythingResource(element) {
  */
 BrowseEverythingResource.prototype.getLocation = function () {
   return this.$element.data('ev-location');
+};
+
+/*
+ *
+ * @return {string}
+ */
+BrowseEverythingResource.prototype.getName = function () {
+  return this.$element.data('ev-file-name');
+};
+
+/*
+ *
+ * @return {string}
+ */
+BrowseEverythingResource.prototype.getSize = function () {
+  return this.$element.data('ev-file-size');
 };
 
 /*

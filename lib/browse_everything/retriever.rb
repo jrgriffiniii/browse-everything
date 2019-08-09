@@ -49,7 +49,7 @@ module BrowseEverything
     # Download a file or resource
     # @param options [Hash]
     # @param target [String, nil] system path to the downloaded file (defaults to a temporary file)
-    def download(spec, target = nil)
+    def download_resource(spec, target = nil)
       if target.nil?
         ext = File.extname(spec['file_name'])
         base = File.basename(spec['file_name'], ext)
@@ -64,6 +64,64 @@ module BrowseEverything
       end
       target
     end
+
+    def build_provider(name)
+      BrowserFactory.for(name: name)
+    end
+
+    # Retrieve the resources for directory or container resource
+    # @param spec [Hash] structure containing the download for the asset
+    # @return [Array<BrowseEverything::FileEntry>]
+    def contents(container_attributes, access_token = nil)
+      provider = build_provider(container_attributes['provider'])
+      file_entries = provider.contents(container_attributes['id'], nil, access_token)
+    end
+
+    # List member resources for a container resource
+    # @param spec [Hash] structure containing the download for the container or
+    # single resource
+    # @return [Array<Hash>]
+    def member_resources(container_attributes, access_token = nil)
+      container_attributes.stringify_keys!
+      container_attributes['container'] = container_attributes['container'] == 'true' if container_attributes['container'].is_a?(String)
+
+      return container_attributes unless container_attributes['container'] && container_attributes['provider']
+
+      member_entries = contents(container_attributes, access_token)
+      members = []
+      member_entries.each do |file_entry|
+        provider = build_provider(file_entry.provider)
+        member_attributes = provider.attributes_for(file_entry, access_token)
+        if file_entry.container?
+          members += member_resources(member_attributes, access_token)
+        else
+          members << member_attributes
+        end
+      end
+      members
+    end
+
+    # Download assets to a file
+    # @param spec [Hash] structure containing the download for the container or
+    # single resource
+    # @return [Array<File>]
+    def download_resources(spec, target = nil)
+      if spec['container'] == 'true' && spec['provider']
+        downloaded = []
+        list_files(spec).each do |child_spec|
+          downloaded += download(child_spec)
+        end
+        downloaded
+      else
+        downloaded_file = download_file(spec, target)
+        [download_file]
+      end
+    end
+
+    # Download an asset to a file
+    # @param spec [Hash] structure containing the download for the asset
+    # @return [Array<File>]
+    alias :download :download_resource
 
     # Retrieve the resource from the storage service
     # @param options [Hash]
