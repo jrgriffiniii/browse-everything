@@ -222,10 +222,14 @@ describe BrowseEverything::Driver::GoogleDrive do
         expect(link).to be_an Array
         expect(link.first).to eq 'https://www.googleapis.com/drive/v3/files/asset-id2?alt=media'
         expect(link.last).to be_a Hash
-        expect(link.last).to include auth_header: { 'Authorization' => 'Bearer access-token' }
+        expect(link.last).to include auth_header: JSON.generate('Authorization' => 'Bearer access-token')
+        expect(link.last).to include auth_token: 'access-token'
+        expect(link.last).to include container: false
         expect(link.last).to include :expires
-        expect(link.last).to include file_name: 'asset-name2.pdf'
+        expect(link.last).to include :file_name
+        expect(link.last).to include id: 'asset-id2'
         expect(link.last).to include file_size: 0
+        expect(link.last).to include provider: :google_drive
       end
     end
 

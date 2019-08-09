@@ -5,20 +5,27 @@ module BrowseEverything
     attr_reader :providers
 
     def initialize(opts = {})
-      url_options = {}
+      config = BrowseEverything.config
+
       if opts.key?(:url_options)
         url_options = opts.delete(:url_options)
+        # config = config.merge(opts.deep_stringify_keys)
+        config = config.merge(opts)
       else
         url_options = opts
-        opts = BrowseEverything.config
       end
 
       @providers = ActiveSupport::HashWithIndifferentAccess.new
-      opts.each_pair do |driver_key, config|
+
+      # This iterates through the configuration for each provider
+      config.each_pair do |driver_key, driver_config|
         begin
           driver = driver_key.to_s
-          driver_klass = BrowseEverything::Driver.const_get((config[:driver] || driver).camelize.to_sym)
-          @providers[driver_key] = driver_klass.new(config.merge(url_options: url_options))
+          driver_name = driver_config[:driver] || driver
+          driver_const = driver_name.camelize.to_sym
+          driver_klass = BrowseEverything::Driver.const_get(driver_const)
+          driver_args = driver_config.merge(url_options: url_options)
+          @providers[driver_key] = driver_klass.new(driver_args)
         rescue NameError
           Rails.logger.warn "Unknown provider: #{driver}"
         end

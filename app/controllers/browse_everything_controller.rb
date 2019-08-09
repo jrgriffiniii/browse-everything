@@ -81,24 +81,22 @@ class BrowseEverythingController < ActionController::Base
     selected_links = []
     selected_directories = []
     payload = {}
-    last_provider_key = nil
 
     selected_files.each do |file|
-      binding.pry
       location = file[:location]
       provider_key_value, id = location.split(/:/)
       provider_key = provider_key_value.to_sym
+      provider = browser.providers[provider_key]
 
-      values = browser.providers[provider_key].link_for(id, file[:name], file[:size])
+      values = provider.link_for(id, file[:name], file[:size], file[:container] == "true")
       values.each do |value|
         (url, extra) = value
         result = { url: url }
         result.merge!(extra) unless extra.nil?
         selected_links << result unless result.fetch(:directory, false)
+        # These are being ignored
         selected_directories << result if result.fetch(:directory, false) && !selected_directories.include?(result)
       end
-
-      last_provider_key = provider_key
     end
 
     payload = selected_links
@@ -167,7 +165,7 @@ class BrowseEverythingController < ActionController::Base
     # Hence, a Browser must be reinstantiated for each request using the state provided in the Rails session
     # @return [BrowseEverything::Browser]
     def browser
-      BrowserFactory.build(session: session, url_options: url_options)
+      BrowseEverything.current_browser = BrowserFactory.build(session: session, url_options: url_options)
     end
 
     # Retrieves a cached provider, or, defaults to the first configured provider

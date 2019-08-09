@@ -49,7 +49,7 @@ module BrowseEverything
     # Download a file or resource
     # @param options [Hash]
     # @param target [String, nil] system path to the downloaded file (defaults to a temporary file)
-    def download(spec, target = nil)
+    def download_resource(spec, target = nil)
       if target.nil?
         ext = File.extname(spec['file_name'])
         base = File.basename(spec['file_name'], ext)
@@ -64,6 +64,86 @@ module BrowseEverything
       end
       target
     end
+
+    # Construct the Provider object
+    # @param [String] name
+    # @return [BrowseEverything::Driver::Base]
+    def self.build_provider(name)
+      BrowserFactory.for(name: name)
+    end
+
+    # Retrieve the resources for directory or container resource
+    # @param spec [Hash] structure containing the download for the asset
+    # @return [Array<BrowseEverything::FileEntry>]
+    def contents(container_attributes)
+      provider = self.class.build_provider(container_attributes.provider)
+      provider.contents(container_attributes.id, nil, container_attributes.auth_token)
+    end
+
+    class ResourceAttributes < OpenStruct
+      def container?
+        container == true || (container.is_a?(String) && container.casecmp('true').zero?)
+      end
+    end
+
+    # List member resources for a container resource
+    # @param [Hash] attrs structure containing the download for the container or
+    #   single resource
+    # @option attrs [Boolean, String] :container
+    # @option attrs [String] :provider
+    # @option attrs [String] :path
+    # @option attrs [String] :auth_token
+    # @param [String] auth_token
+    # @return [Array<Hash>]
+    def member_resources(attrs, auth_token = nil)
+      container_attributes = ResourceAttributes.new(attrs)
+
+      return [] unless container_attributes.container? && !container_attributes.provider.nil?
+      # Work-around, this should be removed
+      if auth_token.nil?
+        auth_token = container_attributes.auth_token
+      else
+        # This needs to be removed
+        container_attributes.auth_token = auth_token
+      end
+
+      member_entries = contents(container_attributes)
+      members = []
+      member_entries.each do |file_entry|
+        # This should be restructured to file_entry.provider
+        provider = self.class.build_provider(file_entry.provider_name)
+        member_attributes = provider.attributes_for(file_entry, auth_token)
+        if file_entry.container?
+          members += member_resources(member_attributes, auth_token)
+        else
+          members << member_attributes
+        end
+      end
+
+      members
+    end
+
+    # Download assets to a file
+    # @param spec [Hash] structure containing the download for the container or
+    # single resource
+    # @return [Array<File>]
+    def download_resources(spec, target = nil)
+      if spec['container'] == 'true' && spec['provider']
+        downloaded = []
+        list_files(spec).each do |child_spec|
+          downloaded += download(child_spec)
+        end
+        downloaded
+      else
+        downloaded_file = download_file(spec, target)
+        [downloaded_file]
+      end
+    end
+
+    # Download an asset to a file
+    # @param spec [Hash] structure containing the download for the asset
+    # @return [Array<File>]
+    alias download download_resource
 
     # Retrieve the resource from the storage service
     # @param options [Hash]

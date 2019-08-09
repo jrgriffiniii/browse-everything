@@ -123,7 +123,26 @@ RSpec.describe BrowseEverythingController, type: :controller do
 
   describe '#resolve' do
     routes { BrowseEverything::Engine.routes }
-    let(:selected_files) { ['file_system:/my/test/file.txt'] }
+    # let(:selected_files) { ['file_system:/my/test/file.txt'] }
+
+    # params["browse_everything"]["selected_files"]
+    # => [<ActionController::Parameters {"location"=>"file_system:/Users/griffinj/src/pulibrary/workspace5/figgy/staged_files/audio_file.wav", "name"=>"audio_file.wav", "size"=>"147550", "container"=>"false", "provider"=>"file_system"} permitted: false>]
+
+    let(:selected_files) do
+      [
+        location: "file_system:/my/test/file.txt",
+        name: "file.txt",
+        size: "147",
+        container: "false",
+        provider: "file_system"
+      ]
+    end
+
+    let(:params) do
+      {
+        selected_files: selected_files
+      }
+    end
 
     before do
       allow(provider).to receive(:token).and_return(nil)
@@ -141,10 +160,12 @@ RSpec.describe BrowseEverythingController, type: :controller do
       json_response = JSON.parse(response.body)
       expect(json_response).not_to be_empty
       resolved = json_response.first
+      expect(resolved).to include "container" => false
       expect(resolved).to include "directory" => false
       expect(resolved).to include "file_name" => "file.txt"
-      expect(resolved).to include "file_size" => 0
       expect(resolved).to include "url" => "file:///my/test/file.txt"
+      expect(resolved).to include "id" => "/my/test/file.txt"
+      expect(resolved).to include "provider" => "file_system"
     end
   end
 end

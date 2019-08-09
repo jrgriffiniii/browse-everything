@@ -120,7 +120,9 @@ module BrowseEverything
           file.size.to_i,
           file.modified_time || Time.new,
           mime_folder,
-          mime_folder ? 'directory' : file.mime_type
+          mime_folder ? 'directory' : file.mime_type,
+          'google_drive',
+          credentials.access_token
         )
       end
 
@@ -156,7 +158,7 @@ module BrowseEverything
       # Retrieve the files for any given resource on Google Drive
       # @param path [String] the root or Folder path for which to list contents
       # @return [Array<BrowseEverything::FileEntry>] file entries for the path
-      def contents(path = '', page_token = nil)
+      def contents(path = '', page_token = nil, access_token = nil)
         # Return the cached response if its been indexed into memory
         pages = pages_for_path(path)
         return pages[page_token] if pages.indexed? page_token
@@ -164,43 +166,64 @@ module BrowseEverything
         request_params = Auth::Google::RequestParameters.new
         request_params.q += " and '#{path}' in parents " if path.present?
 
+        restore_credentials(access_token) if @credentials.nil?
         list_files(drive_service, request_params, path: path, page_token: page_token)
 
         page_index = page_token || pagination_klass::FIRST_PAGE_TOKEN
         pages[page_index]
       end
 
+      # Generates the authorization header for an access token
+      # @param [String] access_token
+      # @return [String] the JSON-encoded authorization header
+      def self.authorization_header(access_token)
+        JSON.generate(
+          "Authorization" => "Bearer #{access_token}"
+        )
+      end
+
+      # Generate the attributes Hash for a FileEntry object
+      # This should be moved to FileEntry#attributes
+      # @param [BrowseEverything::FileEntry] file_entry
+      # @param [String] access_token
+      # @return [Hash]
+      def attributes_for(file_entry, access_token = nil)
+        access_token = credentials.access_token if access_token.nil?
+        auth_header = self.class.authorization_header(access_token)
+        file_entry_url = download_url(file_entry.id)
+
+        {
+          id: file_entry.id,
+          url: file_entry_url,
+          auth_token: access_token,
+          auth_header: auth_header,
+          file_name: file_entry.name,
+          file_size: file_entry.size,
+          container: file_entry.container?,
+          provider: file_entry.provider_name
+        }
+      end
+
       # Retrieve a link for a resource
       # @param id [String] identifier for the resource
       # @return [Array<String, Hash>] authorized link to the resource
-      def link_for(id, file_name = '', file_size = 0)
+      def link_for(id, file_name = '', file_size = 0, container = false, access_token = nil)
         # This should be all that is needed
-        auth_header = { 'Authorization' => "Bearer #{credentials.access_token}" }
+        access_token = credentials.access_token if access_token.nil?
+        auth_header = self.class.authorization_header(access_token)
+
         extras = {
-          auth_header: auth_header,
+          id: id,
           expires: 1.hour.from_now,
           file_name: file_name,
-          file_size: file_size
+          file_size: file_size,
+          container: container,
+          provider: :google_drive,
+          auth_token: access_token,
+          auth_header: auth_header
         }
-        return [[download_url(id), extras]]
 
-        file = drive_service.get_file(id, fields: 'id, name, size, mimeType')
-        if file.mime_type == 'application/vnd.google-apps.folder'
-          entries = []
-          contents(file.id).map do |drive_file|
-            entries += link_for(drive_file.id)
-          end
-          entries
-        else
-          auth_header = { 'Authorization' => "Bearer #{credentials.access_token}" }
-          extras = {
-            auth_header: auth_header,
-            expires: 1.hour.from_now,
-            file_name: file.name,
-            file_size: file.size.to_i
-          }
-          [[download_url(id), extras]]
-        end
+        [[download_url(id), extras]]
       end
 
       # Provides a URL for authorizing against Google Drive
@@ -296,7 +319,7 @@ module BrowseEverything
         # @see http://www.rubydoc.info/gems/googleauth/Google/Auth/Stores/FileTokenStore FileTokenStore for googleauth
         # @return [Tempfile] temporary file within which to cache credentials
         def file_token_store_path
-          Tempfile.new('gdrive.yaml')
+          Rails.root.join('tmp', 'gdrive.yaml')
         end
 
         # Provide the scope for the service granted access to the Google Drive
@@ -306,7 +329,7 @@ module BrowseEverything
         end
 
         # Provides the user ID for caching access tokens
-        # 
+        #
         # (This is a hack which attempts to anonymize the access tokens)
         # @return [String] the ID for the user
         def user_id

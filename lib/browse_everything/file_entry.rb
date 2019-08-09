@@ -2,17 +2,23 @@
 
 module BrowseEverything
   class FileEntry
-    attr_reader :id, :location, :name, :size, :mtime, :type
+    attr_reader :id, :location, :name, :size, :mtime, :type, :provider_name, :auth_token
 
-    def initialize(id, location, name, size, mtime, container, type = nil)
+    # rubocop:disable Metrics/ParameterLists
+    def initialize(id, location, name, size, mtime, container, type = nil, provider_name = nil, auth_token = nil)
       @id        = id
       @location  = location
       @name      = name
       @size      = size
       @mtime     = mtime
       @container = container
-      @type      = type || (@container ? 'application/x-directory' : Rack::Mime.mime_type(File.extname(name)))
+      @type      = type
+      @provider_name = provider_name
+      @auth_token = auth_token
+
+      @type = default_type if @type.nil?
     end
+    # rubocop:enable Metrics/ParameterLists
 
     def relative_parent_path?
       name =~ /^\.\.?$/ ? true : false
@@ -20,6 +26,38 @@ module BrowseEverything
 
     def container?
       @container
+    end
+
+    def provider
+      return @provider unless @provider.nil?
+
+      provider = BrowserFactory.for(name: provider_name)
+      return BrowseEverything::Driver::Base.new({}) if provider.nil?
+
+      @provider = provider
+    end
+
+    def mime_type
+      extname = File.extname(name)
+      provider.class.mime_type(extname)
+    end
+
+    def default_type
+      return provider.class.container_mime_type if container?
+
+      mime_type
+    end
+
+    def url
+      return unless provider.respond_to?(:download_url)
+
+      provider.download_url(id)
+    end
+
+    def auth_header
+      return unless provider.respond_to?(:auth_header)
+
+      provider.auth_header(auth_token)
     end
   end
 end

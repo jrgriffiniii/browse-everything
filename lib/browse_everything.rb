@@ -52,9 +52,15 @@ module BrowseEverything
 
   class << self
     attr_writer :config
+    attr_accessor :current_browser
+
+    def current_provider
+      current_browser.session
+    end
 
     def configure(value)
       return if value.nil?
+
       if value.is_a?(Hash)
         @config = ActiveSupport::HashWithIndifferentAccess.new value
       elsif value.is_a?(String)
@@ -78,10 +84,10 @@ module BrowseEverything
     end
 
     def config
-      if @config.nil?
-        config_path = Rails.root.join 'config', 'browse_everything_providers.yml'
-        configure config_path.to_s
-      end
+      return @config unless @config.nil?
+
+      config_path = Rails.root.join('config', 'browse_everything_providers.yml')
+      configure(config_path.to_s)
       @config
     end
   end

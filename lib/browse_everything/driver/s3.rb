@@ -120,7 +120,16 @@ module BrowseEverything
         # @param dir [String]
         # @return [BrowseEverything::FileEntry]
         def entry_for(name, size, date, dir)
-          BrowseEverything::FileEntry.new(name, [key, name].join(':'), File.basename(name), size, date, dir)
+          BrowseEverything::FileEntry.new(
+            name,
+            [key, name].join(':'),
+            File.basename(name),
+            size,
+            date,
+            dir,
+            nil,
+            's3'
+          )
         end
 
         # Populate the entries with FileEntry objects from an S3 listing
