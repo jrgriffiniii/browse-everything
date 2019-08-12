@@ -71,11 +71,11 @@ module BrowseEverything
 
     # Generate the attributes from a FileEntry
     # @param [BrowseEverything::FileEntry] file_entry
-    # @param [String] access_token
+    # @param [String] auth_token
     # @return [Hash]
-    def attributes(file_entry, access_token)
+    def attributes(file_entry, auth_token)
       provider = build_provider(file_entry.provider_name)
-      provider.attributes_for(file_entry, access_token)
+      provider.attributes_for(file_entry, auth_token)
     end
 
     # Retrieve the resources for directory or container resource
@@ -83,7 +83,7 @@ module BrowseEverything
     # @return [Array<BrowseEverything::FileEntry>]
     def contents(container_attributes)
       provider = build_provider(container_attributes.provider)
-      provider.contents(container_attributes.id, nil, container_attributes.access_token)
+      provider.contents(container_attributes.id, nil, container_attributes.auth_token)
     end
 
     class ResourceAttributes < OpenStruct
@@ -98,25 +98,29 @@ module BrowseEverything
     # @option attrs [Boolean, String] :container
     # @option attrs [String] :provider
     # @option attrs [String] :path
-    # @option attrs [String] :access_token
-    # @param [String] access_token
+    # @option attrs [String] :auth_token
+    # @param [String] auth_token
     # @return [Array<Hash>]
-    def member_resources(attrs, access_token = nil)
+    def member_resources(attrs, auth_token = nil)
       container_attributes = ResourceAttributes.new(attrs)
 
       return [] unless container_attributes.container? && !container_attributes.provider.nil?
       # Work-around, this should be removed
-      access_token = container_attributes.access_token if access_token.nil?
-      container_attributes.access_token = access_token
+      if auth_token.nil?
+        auth_token = container_attributes.auth_token
+      else
+        # This needs to be removed
+        container_attributes.auth_token = auth_token
+      end
 
       member_entries = contents(container_attributes)
       members = []
       member_entries.each do |file_entry|
         # This should be restructured to file_entry.provider
         provider = build_provider(file_entry.provider_name)
-        member_attributes = provider.attributes_for(file_entry, access_token)
+        member_attributes = provider.attributes_for(file_entry, auth_token)
         if file_entry.container?
-          members += member_resources(member_attributes, access_token)
+          members += member_resources(member_attributes, auth_token)
         else
           members << member_attributes
         end

@@ -197,6 +197,7 @@ module BrowseEverything
         auth_header = { 'Authorization' => "Bearer #{access_token}" }
         extras = {
           id: id,
+          auth_token: access_token,
           auth_header: auth_header,
           expires: 1.hour.from_now,
           file_name: file_name,

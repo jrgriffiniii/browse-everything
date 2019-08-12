@@ -60,7 +60,13 @@ module BrowseEverything
         file = box_client.file_by_id(id)
         download_url = file.download_url
         auth_header = { 'Authorization' => "Bearer #{@token}" }
-        extras = { auth_header: auth_header, expires: 1.hour.from_now, file_name: file.name, file_size: file.size.to_i }
+        extras = {
+          auth_token: @token,
+          auth_header: auth_header,
+          expires: 1.hour.from_now,
+          file_name: file.name,
+          file_size: file.size.to_i
+        }
         [download_url, extras]
       end
 
