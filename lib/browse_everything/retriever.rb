@@ -69,15 +69,6 @@ module BrowseEverything
       BrowserFactory.for(name: name)
     end
 
-    # Generate the attributes from a FileEntry
-    # @param [BrowseEverything::FileEntry] file_entry
-    # @param [String] auth_token
-    # @return [Hash]
-    def attributes(file_entry, auth_token)
-      provider = build_provider(file_entry.provider_name)
-      provider.attributes_for(file_entry, auth_token)
-    end
-
     # Retrieve the resources for directory or container resource
     # @param spec [Hash] structure containing the download for the asset
     # @return [Array<BrowseEverything::FileEntry>]

@@ -121,7 +121,8 @@ module BrowseEverything
           file.modified_time || Time.new,
           mime_folder,
           mime_folder ? 'directory' : file.mime_type,
-          'google_drive'
+          'google_drive',
+          credentials.access_token
         )
       end
 
@@ -172,14 +173,15 @@ module BrowseEverything
         pages[page_index]
       end
 
-      def attributes_for(file_entry, access_token = nil)
-        access_token = credentials.access_token if access_token.nil?
-        auth_header = { 'Authorization' => "Bearer #{access_token}" }
+      def attributes_for(file_entry, auth_token = nil)
+        auth_token = credentials.access_token if auth_token.nil?
+        auth_header = { 'Authorization' => "Bearer #{auth_token}" }
 
         file_entry_url = download_url(file_entry.id)
         {
           id: file_entry.id,
           url: file_entry_url,
+          auth_token: auth_token,
           auth_header: auth_header,
           file_name: file_entry.name,
           file_size: file_entry.size,
@@ -301,7 +303,7 @@ module BrowseEverything
         # @see http://www.rubydoc.info/gems/googleauth/Google/Auth/Stores/FileTokenStore FileTokenStore for googleauth
         # @return [Tempfile] temporary file within which to cache credentials
         def file_token_store_path
-          Tempfile.new('gdrive.yaml')
+          Rails.root.join('tmp', 'gdrive.yaml')
         end
 
         # Provide the scope for the service granted access to the Google Drive
