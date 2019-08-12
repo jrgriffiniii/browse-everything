@@ -69,6 +69,10 @@ module BrowseEverything
       BrowserFactory.for(name: name)
     end
 
+    # Generate the attributes from a FileEntry
+    # @param [BrowseEverything::FileEntry] file_entry
+    # @param [String] access_token
+    # @return [Hash]
     def attributes(file_entry, access_token)
       provider = build_provider(file_entry.provider_name)
       provider.attributes_for(file_entry, access_token)
@@ -77,24 +81,38 @@ module BrowseEverything
     # Retrieve the resources for directory or container resource
     # @param spec [Hash] structure containing the download for the asset
     # @return [Array<BrowseEverything::FileEntry>]
-    def contents(container_attributes, access_token = nil)
-      provider = build_provider(container_attributes['provider'])
-      file_entries = provider.contents(container_attributes['id'], nil, access_token)
+    def contents(container_attributes)
+      provider = build_provider(container_attributes.provider)
+      provider.contents(container_attributes.id, nil, container_attributes.access_token)
+    end
+
+    class ResourceAttributes < OpenStruct
+      def container?
+        self.container == true || (self.container.is_a?(String) && self.container.downcase == 'true')
+      end
     end
 
     # List member resources for a container resource
-    # @param spec [Hash] structure containing the download for the container or
-    # single resource
+    # @param [Hash] attrs structure containing the download for the container or
+    #   single resource
+    # @option attrs [Boolean, String] :container
+    # @option attrs [String] :provider
+    # @option attrs [String] :path
+    # @option attrs [String] :access_token
+    # @param [String] access_token
     # @return [Array<Hash>]
-    def member_resources(container_attributes, access_token = nil)
-      container_attributes.stringify_keys!
-      container_attributes['container'] = container_attributes['container'] == 'true' if container_attributes['container'].is_a?(String)
+    def member_resources(attrs, access_token = nil)
+      container_attributes = ResourceAttributes.new(attrs)
 
-      return container_attributes unless container_attributes['container'] && container_attributes['provider']
+      return [] unless container_attributes.container? && !container_attributes.provider.nil?
+      # Work-around, this should be removed
+      access_token = container_attributes.access_token if access_token.nil?
+      container_attributes.access_token = access_token
 
-      member_entries = contents(container_attributes, access_token)
+      member_entries = contents(container_attributes)
       members = []
       member_entries.each do |file_entry|
+        # This should be restructured to file_entry.provider
         provider = build_provider(file_entry.provider_name)
         member_attributes = provider.attributes_for(file_entry, access_token)
         if file_entry.container?
