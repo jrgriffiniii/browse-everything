@@ -223,7 +223,7 @@ module BrowseEverything
           auth_header: auth_header
         }
 
-        return [[download_url(id), extras]]
+        [[download_url(id), extras]]
       end
 
       # Provides a URL for authorizing against Google Drive
@@ -329,7 +329,7 @@ module BrowseEverything
         end
 
         # Provides the user ID for caching access tokens
-        # 
+        #
         # (This is a hack which attempts to anonymize the access tokens)
         # @return [String] the ID for the user
         def user_id

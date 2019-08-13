@@ -69,7 +69,7 @@ module BrowseEverything
 
         link_attributes = {
           id: full_path,
-          file_name: File.basename(path),
+          file_name: file_name,
           file_size: file_size,
           container: container,
           provider: 'file_system'

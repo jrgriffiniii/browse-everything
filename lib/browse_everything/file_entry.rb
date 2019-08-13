@@ -4,6 +4,7 @@ module BrowseEverything
   class FileEntry
     attr_reader :id, :location, :name, :size, :mtime, :type, :provider_name, :auth_token
 
+    # rubocop:disable Metrics/ParameterLists
     def initialize(id, location, name, size, mtime, container, type = nil, provider_name = nil, auth_token = nil)
       @id        = id
       @location  = location
@@ -15,6 +16,7 @@ module BrowseEverything
       @provider_name = provider_name
       @auth_token = auth_token
     end
+    # rubocop:enable Metrics/ParameterLists
 
     def relative_parent_path?
       name =~ /^\.\.?$/ ? true : false

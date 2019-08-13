@@ -82,7 +82,7 @@ module BrowseEverything
 
     class ResourceAttributes < OpenStruct
       def container?
-        self.container == true || (self.container.is_a?(String) && self.container.downcase == 'true')
+        container == true || (container.is_a?(String) && container.casecmp('true').zero?)
       end
     end
 
@@ -136,14 +136,14 @@ module BrowseEverything
         downloaded
       else
         downloaded_file = download_file(spec, target)
-        [download_file]
+        [downloaded_file]
       end
     end
 
     # Download an asset to a file
     # @param spec [Hash] structure containing the download for the asset
     # @return [Array<File>]
-    alias :download :download_resource
+    alias download download_resource
 
     # Retrieve the resource from the storage service
     # @param options [Hash]
