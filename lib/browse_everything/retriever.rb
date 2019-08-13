@@ -65,7 +65,10 @@ module BrowseEverything
       target
     end
 
-    def build_provider(name)
+    # Construct the Provider object
+    # @param [String] name
+    # @return [BrowseEverything::Driver::Base]
+    def self.build_provider(name)
       BrowserFactory.for(name: name)
     end
 
@@ -73,7 +76,7 @@ module BrowseEverything
     # @param spec [Hash] structure containing the download for the asset
     # @return [Array<BrowseEverything::FileEntry>]
     def contents(container_attributes)
-      provider = build_provider(container_attributes.provider)
+      provider = self.class.build_provider(container_attributes.provider)
       provider.contents(container_attributes.id, nil, container_attributes.auth_token)
     end
 
@@ -108,7 +111,7 @@ module BrowseEverything
       members = []
       member_entries.each do |file_entry|
         # This should be restructured to file_entry.provider
-        provider = build_provider(file_entry.provider_name)
+        provider = self.class.build_provider(file_entry.provider_name)
         member_attributes = provider.attributes_for(file_entry, auth_token)
         if file_entry.container?
           members += member_resources(member_attributes, auth_token)
@@ -116,6 +119,7 @@ module BrowseEverything
           members << member_attributes
         end
       end
+
       members
     end
 

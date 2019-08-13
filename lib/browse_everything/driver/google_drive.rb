@@ -173,15 +173,29 @@ module BrowseEverything
         pages[page_index]
       end
 
-      def attributes_for(file_entry, auth_token = nil)
-        auth_token = credentials.access_token if auth_token.nil?
-        auth_header = { 'Authorization' => "Bearer #{auth_token}" }
+      # Generates the authorization header for an access token
+      # @param [String] access_token
+      # @return [String] the JSON-encoded authorization header
+      def self.authorization_header(access_token)
+        JSON.generate(
+          "Authorization" => "Bearer #{access_token}"
+        )
+      end
 
+      # Generate the attributes Hash for a FileEntry object
+      # This should be moved to FileEntry#attributes
+      # @param [BrowseEverything::FileEntry] file_entry
+      # @param [String] access_token
+      # @return [Hash]
+      def attributes_for(file_entry, access_token = nil)
+        access_token = credentials.access_token if access_token.nil?
+        auth_header = self.class.authorization_header(access_token)
         file_entry_url = download_url(file_entry.id)
+
         {
           id: file_entry.id,
           url: file_entry_url,
-          auth_token: auth_token,
+          auth_token: access_token,
           auth_header: auth_header,
           file_name: file_entry.name,
           file_size: file_entry.size,
@@ -196,17 +210,19 @@ module BrowseEverything
       def link_for(id, file_name = '', file_size = 0, container = false, access_token = nil)
         # This should be all that is needed
         access_token = credentials.access_token if access_token.nil?
-        auth_header = { 'Authorization' => "Bearer #{access_token}" }
+        auth_header = self.class.authorization_header(access_token)
+
         extras = {
           id: id,
-          auth_token: access_token,
-          auth_header: auth_header,
           expires: 1.hour.from_now,
           file_name: file_name,
           file_size: file_size,
           container: container,
-          provider: :google_drive
+          provider: :google_drive,
+          auth_token: access_token,
+          auth_header: auth_header
         }
+
         return [[download_url(id), extras]]
       end
 
