@@ -153,7 +153,16 @@ module BrowseEverything
         # @param file [String] ID to the file resource
         # @return [BrowseEverything::File]
         def directory_entry(file)
-          BrowseEverything::FileEntry.new(file.id, "#{key}:#{file.id}", file.name, file.size, file.created_at, file.type == 'folder')
+          BrowseEverything::FileEntry.new(
+            file.id,
+            "#{key}:#{file.id}",
+            file.name,
+            file.size,
+            file.created_at,
+            file.type == 'folder',
+            nil,
+            'box'
+          )
         end
     end
   end
