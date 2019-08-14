@@ -3,6 +3,10 @@
 module BrowseEverything
   module Driver
     class FileSystem < Base
+      def self.container_mime_type
+        'application/x-directory'
+      end
+
       def icon
         'file'
       end
@@ -12,16 +16,18 @@ module BrowseEverything
       end
 
       def contents(path = '', _page_index = 0, _auth_token = nil)
-        real_path = if File.exist?(path)
-                      path
+        real_path = if path == '/' || !File.exist?(path)
+                      File.join(home_path, path)
                     else
-                      File.join(config[:home], path)
+                      path
                     end
+
         values = if File.directory?(real_path)
                    make_directory_entry real_path
                  else
                    [details(real_path)]
                  end
+
         @entries = values.compact
 
         @sorter.call(@entries)
@@ -72,6 +78,7 @@ module BrowseEverything
           file_name: file_name,
           file_size: file_size,
           container: container,
+          directory: container,
           provider: 'file_system'
         }
 
@@ -97,7 +104,7 @@ module BrowseEverything
           info.size,
           info.mtime,
           info.directory?,
-          info.directory? ? 'container' : 'file',
+          nil,
           'file_system'
         )
       end
@@ -113,8 +120,11 @@ module BrowseEverything
           Dir.glob(pattern).collect { |f| details(f) }
         end
 
+        def home_path
+          Pathname.new(config[:home])
+        end
+
         def make_pathname(path)
-          home_path = Pathname.new(config[:home])
           expanded = File.expand_path(path)
           file_entry_path = Pathname.new(expanded)
           file_entry_path.relative_path_from(home_path)

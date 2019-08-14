@@ -33,6 +33,19 @@ module BrowseEverything
         def inherited(subclass)
           subclass.sorter = sorter
         end
+
+        # Determine the content media/MIME type from the file extension name
+        # @param [String] extname
+        # @return [String]
+        def mime_type(extname)
+          Rack::Mime.mime_type(extname)
+        end
+
+        # Generate the default content media/MIME type for a container resource
+        # @return [String]
+        def container_mime_type
+          'container'
+        end
       end
 
       # Constructor

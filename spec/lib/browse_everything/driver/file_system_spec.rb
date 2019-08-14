@@ -20,12 +20,12 @@ describe BrowseEverything::Driver::FileSystem do
   end
 
   describe 'simple properties' do
-    subject    { provider                }
+    subject    { provider }
 
     its(:name) { is_expected.to eq('File System') }
     its(:key)  { is_expected.to eq('file_system') }
-    its(:icon) { is_expected.to be_a(String)     }
-    specify    { is_expected.to be_authorized    }
+    its(:icon) { is_expected.to be_a(String)      }
+    specify    { is_expected.to be_authorized     }
   end
 
   describe '#contents' do
@@ -33,7 +33,9 @@ describe BrowseEverything::Driver::FileSystem do
       let(:contents) { provider.contents('/') }
 
       context 'when there is one directory' do
-        subject { contents[0] }
+        subject do
+          contents[0]
+        end
 
         its(:name) { is_expected.to eq('dir_1') }
         specify    { is_expected.to be_container }
@@ -104,9 +106,20 @@ describe BrowseEverything::Driver::FileSystem do
     subject { provider.link_for('/path/to/file') }
 
     it {
-      is_expected.to eq([
-                          ['file:///path/to/file', { directory: false, file_name: 'file', file_size: 0 }]
-                        ])
+      is_expected.to eq(
+        [
+          [
+            'file:///path/to/file', {
+              directory: false,
+              container: false,
+              file_name: 'file',
+              file_size: 0,
+              id: '/path/to/file',
+              provider: 'file_system'
+            }
+          ]
+        ]
+      )
     }
   end
 end

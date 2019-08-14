@@ -12,9 +12,11 @@ module BrowseEverything
       @size      = size
       @mtime     = mtime
       @container = container
-      @type      = type || (@container ? 'application/x-directory' : Rack::Mime.mime_type(File.extname(name)))
+      @type      = type
       @provider_name = provider_name
       @auth_token = auth_token
+
+      @type = default_type if @type.nil?
     end
     # rubocop:enable Metrics/ParameterLists
 
@@ -28,6 +30,17 @@ module BrowseEverything
 
     def provider
       @provider ||= BrowserFactory.for(name: provider_name)
+    end
+
+    def mime_type
+      extname = File.extname(name)
+      provider.class.mime_type(extname)
+    end
+
+    def default_type
+      return provider.class.container_mime_type if container?
+
+      mime_type
     end
 
     def url
