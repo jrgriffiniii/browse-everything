@@ -44,7 +44,7 @@ module BrowseEverything
         # Generate the default content media/MIME type for a container resource
         # @return [String]
         def container_mime_type
-          'container'
+          'application/x-directory'
         end
       end
 

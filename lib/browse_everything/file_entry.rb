@@ -29,7 +29,12 @@ module BrowseEverything
     end
 
     def provider
-      @provider ||= BrowserFactory.for(name: provider_name)
+      return @provider unless @provider.nil?
+
+      provider = BrowserFactory.for(name: provider_name)
+      return BrowseEverything::Driver::Base.new({}) if provider.nil?
+
+      @provider = provider
     end
 
     def mime_type
