@@ -9,12 +9,14 @@ module BrowseEverything
 
       if opts.key?(:url_options)
         url_options = opts.delete(:url_options)
-        config.merge(opts)
+        # config = config.merge(opts.deep_stringify_keys)
+        config = config.merge(opts)
       else
         url_options = opts
       end
 
       @providers = ActiveSupport::HashWithIndifferentAccess.new
+
       # This iterates through the configuration for each provider
       config.each_pair do |driver_key, driver_config|
         begin
