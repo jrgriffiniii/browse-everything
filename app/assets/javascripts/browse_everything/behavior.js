@@ -32,6 +32,9 @@ BrowseEverythingForm.prototype.appendFileInputElements = function(resource) {
 
   var provider_input = $("<input type='hidden' class='ev-url' name='browse_everything[selected_files][][provider]'/>").val( resource.$element.data('ev-provider') );
   this.$form.append(provider_input);
+
+  var type_input = $("<input type='hidden' class='ev-url' name='browse_everything[selected_files][][type]'/>").val( resource.$element.data('ev-type') );
+  this.$form.append(type_input);
 };
 
 /**
@@ -58,6 +61,9 @@ BrowseEverythingForm.prototype.appendDirectoryInputElements = function(resource)
   // Add the provider
   var provider_input = $("<input type='hidden' class='ev-url' name='browse_everything[selected_directories][][provider]'/>").val( resource.$element.data('ev-provider') );
   this.$form.append(provider_input);
+
+  var type_input = $("<input type='hidden' class='ev-url' name='browse_everything[selected_directories][][type]'/>").val( resource.$element.data('ev-type') );
+  this.$form.append(type_input);
 };
 
 /**

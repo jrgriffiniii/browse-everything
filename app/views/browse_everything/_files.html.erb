@@ -30,6 +30,7 @@
           data-ev-file-date="<%= file.mtime %>"
           <%= file.container? ? 'data-ev-container' : '' %>
           data-ev-provider="<%= file.provider_name %>"
+          data-ev-type="<%= file.type %>"
           data-tt-id="<%= path %>"
           data-tt-parent-id="<%= parent %>"
           data-tt-branch="<%= file.container? ? 'true' : 'false' %>">

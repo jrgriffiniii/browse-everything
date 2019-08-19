@@ -3,10 +3,6 @@
 module BrowseEverything
   module Driver
     class FileSystem < Base
-      def self.container_mime_type
-        'application/x-directory'
-      end
-
       def icon
         'file'
       end
@@ -79,6 +75,7 @@ module BrowseEverything
           file_size: file_size,
           container: container,
           directory: container,
+          type: container ? self.class.container_mime_type : self.class.file_mime_type,
           provider: 'file_system'
         }
 

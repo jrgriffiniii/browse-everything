@@ -218,6 +218,7 @@ module BrowseEverything
           file_name: file_name,
           file_size: file_size,
           container: container,
+          type: container ? self.class.container_mime_type : self.class.file_mime_type,
           provider: :google_drive,
           auth_token: access_token,
           auth_header: auth_header

@@ -2,6 +2,9 @@
 
 module BrowseEverything
   module Driver
+    DEFAULT_CONTAINER_MEDIA_TYPE = 'application/x-directory'
+    DEFAULT_BYTESTREAM_MEDIA_TYPE = 'application/octet-stream'
+
     # Abstract class for provider classes
     class Base
       include BrowseEverything::Engine.routes.url_helpers
@@ -44,13 +47,20 @@ module BrowseEverything
         # Generate the default content media/MIME type for a container resource
         # @return [String]
         def container_mime_type
-          'application/x-directory'
+          DEFAULT_CONTAINER_MEDIA_TYPE
         end
+
+        # Generate the default content media/MIME type for a bytestream
+        # @return [String]
+        def bytestream_mime_type
+          DEFAULT_BYTESTREAM_MEDIA_TYPE
+        end
+        alias file_mime_type bytestream_mime_type
       end
 
       # Constructor
       # @param config_values [Hash] configuration for the driver
-      def initialize(config_values)
+      def initialize(config_values = {})
         @config = config_values
         @sorter = self.class.sorter || self.class.default_sorter
         validate_config
