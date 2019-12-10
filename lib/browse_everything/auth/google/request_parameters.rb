@@ -24,6 +24,7 @@ module BrowseEverything
               fields: 'nextPageToken,files(name,id,mimeType,size,modifiedTime,parents,web_content_link)',
               supports_team_drives: true,
               include_team_drive_items: true,
+              include_items_from_all_drives: true,
               corpora: 'user,allTeamDrives',
               page_size: 1000
             }
