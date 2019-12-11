@@ -28,6 +28,7 @@ Metrics/CyclomaticComplexity:
   Max: 7
   Exclude:
     - 'app/controllers/browse_everything_controller.rb'
+    - 'lib/browse_everything/driver/google_drive.rb'
 
 # Offense count: 10
 # Configuration parameters: CountComments.
@@ -42,6 +43,7 @@ Metrics/ParameterLists:
 Metrics/PerceivedComplexity:
   Exclude:
     - 'app/controllers/browse_everything_controller.rb'
+    - 'lib/browse_everything/driver/google_drive.rb'
 
 # Offense count: 1
 RSpec/DescribeClass:

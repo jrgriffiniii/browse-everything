@@ -132,10 +132,13 @@ module BrowseEverything
       # @param path [String] the path (default to the root)
       # @return [Array<BrowseEverything::FileEntry>] file entries for the path
       def list_files(drive, request_params, path: '', page_token:)
+        path = 'root' if path.blank?
         pages = pages_for_path(path)
 
         # See https://developers.google.com/drive/api/v3/folder
-        request_params.q += " and parents = 'root'" if path.empty?
+        request_params.add_user_query_filter(query_term: "parents", operator: 'in', values: path)
+        request_params.add_shared_query_filter(query_term: "parents", operator: 'in', values: path) unless path == 'root'
+
         # Ensures that the next page token is used only if the pages have been populated by an initial response
         request_params.page_token = page_token unless page_token.nil? || page_token == pagination_klass::FIRST_PAGE_TOKEN
 
@@ -160,6 +163,7 @@ module BrowseEverything
       # @return [Array<BrowseEverything::FileEntry>] file entries for the path
       def contents(path = '', page_token = nil, access_token = nil)
         # Return the cached response if its been indexed into memory
+        path = 'root' if path.blank?
         pages = pages_for_path(path)
         return pages[page_token] if pages.indexed? page_token
 
@@ -170,7 +174,7 @@ module BrowseEverything
         list_files(drive_service, request_params, path: path, page_token: page_token)
 
         page_index = page_token || pagination_klass::FIRST_PAGE_TOKEN
-        pages[page_index]
+        @sorter.call(pages[page_index])
       end
 
       # Generates the authorization header for an access token
