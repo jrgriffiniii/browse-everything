@@ -17,7 +17,6 @@ module BrowseEverything
       # This iterates through the configuration for each provider
       config.each_pair do |driver_key, driver_config|
         begin
-          # binding.pry
           driver = driver_key.to_s
           driver_name = driver_config[:driver] || driver
           driver_const = driver_name.camelize.to_sym

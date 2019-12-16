@@ -23,7 +23,10 @@ module BrowseEverything
     end
 
     def hidden?
-      file? && path =~ /^\./
+      return false unless file?
+
+      base_name = File.basename(path)
+      base_name =~ /^\./
     end
 
     private

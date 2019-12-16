@@ -74,7 +74,6 @@ module BrowseEverything
 
     def configure(value)
       return if value.nil?
-      # binding.pry
 
       options = {}
       if value.is_a?(Hash)
@@ -89,8 +88,6 @@ module BrowseEverything
       else
         raise InitializationError, "Unrecognized configuration: #{value.inspect}"
       end
-      # @config = ActiveSupport::HashWithIndifferentAccess.new(options.merge(default_options))
-      # binding.pry
       @config = ActiveSupport::HashWithIndifferentAccess.new(default_options.merge(options))
 
       if @config.include? 'drop_box'
