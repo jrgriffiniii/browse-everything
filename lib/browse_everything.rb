@@ -93,7 +93,7 @@ module BrowseEverything
       # binding.pry
       @config = ActiveSupport::HashWithIndifferentAccess.new(default_options.merge(options))
 
-      if @config.include? 'drop_box' # rubocop:disable Style/GuardClause
+      if @config.include? 'drop_box'
         warn '[DEPRECATION] `drop_box` is deprecated.  Please use `dropbox` instead.'
         @config['dropbox'] = @config.delete('drop_box')
       end

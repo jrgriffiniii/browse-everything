@@ -8,9 +8,7 @@ module BrowseEverything
       opts = opts.deep_symbolize_keys
 
       # Handling for legacy arguments
-      if opts.key?(:protocol)
-        opts = { url_options: opts }
-      end
+      opts = { url_options: opts } if opts.key?(:protocol)
 
       config = BrowseEverything.configure(opts)
       url_options = opts.fetch(:url_options, {})
