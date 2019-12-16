@@ -3,7 +3,7 @@
 include BrowserConfigHelper
 
 describe BrowseEverything::Driver::FileSystem do
-  let(:home)    { File.expand_path(BrowseEverything.config['file_system'][:home]) }
+  let(:home) { Rails.root.join('..', 'spec', 'fixtures', 'file_system') }
   let(:browser) { BrowseEverything::Browser.new(stub_configuration) }
   let(:provider) { browser.providers['file_system'] }
 
