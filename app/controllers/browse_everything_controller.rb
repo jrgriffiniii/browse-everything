@@ -131,11 +131,8 @@ class BrowseEverythingController < ActionController::Base
     # Generates the authentication link for a given provider service
     # @return [String] the authentication link
     def auth_link
-      host = request.host
-      port = request.port
-      options = {host: host, port: port}.merge(connector_response_url_options)
       @auth_link ||= if provider.present?
-                       link, data = provider.auth_link(options)
+                       link, data = provider.auth_link(connector_response_url_options)
                        provider_session.data = data
                        link = "#{link}&state=#{provider.key}" unless link.to_s.include?('state')
                        link

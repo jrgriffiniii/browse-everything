@@ -117,9 +117,15 @@ describe BrowseEverything::Driver::GoogleDrive do
 
   context 'with a valid connection' do
     let(:driver) { described_class.new(provider_yml) }
+    let(:options) do
+      {
+        host: 'http://localhost',
+        port: 3000
+      }
+    end
 
     before do
-      driver.connect({ code: 'code' }, {}, nil)
+      driver.connect({ code: 'code' }, {}, options)
     end
 
     describe '#authorized?' do
@@ -232,7 +238,7 @@ describe BrowseEverything::Driver::GoogleDrive do
 
       it 'exposes the authorization endpoint URI' do
         expect(uri).to be_a Addressable::URI
-        expect(uri.to_s).to eq 'https://accounts.google.com/o/oauth2/auth?access_type=offline&approval_prompt=force&client_id=CLIENTID&include_granted_scopes=true&redirect_uri=http://example.com:3000/browse/connect&response_type=code&scope=https://www.googleapis.com/auth/drive.readonly'
+        expect(uri.to_s).to eq 'https://accounts.google.com/o/oauth2/auth?access_type=offline&approval_prompt=force&client_id=CLIENTID&include_granted_scopes=true&redirect_uri=http://localhost:3000/browse/connect&response_type=code&scope=https://www.googleapis.com/auth/drive.readonly'
       end
     end
 

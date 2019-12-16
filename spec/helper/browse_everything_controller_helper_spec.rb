@@ -8,15 +8,10 @@ describe BrowseEverythingController, type: :controller do
   subject { helper_context.auth_link.scan(/state/) }
 
   let(:helper_context) { controller.view_context }
-  let(:browser) { BrowseEverything::Browser.new(url_options) }
+  let(:browser) { BrowseEverything::Browser.new(stub_configuration) }
 
   before do
-    stub_configuration
     allow(controller).to receive(:provider).and_return(provider)
-  end
-
-  after do
-    unstub_configuration
   end
 
   context 'when using Dropbox as a provider' do

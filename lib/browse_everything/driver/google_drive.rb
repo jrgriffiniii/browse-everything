@@ -232,8 +232,9 @@ module BrowseEverything
 
       # Provides a URL for authorizing against Google Drive
       # @return [String] the URL
-      def auth_link(*_args)
-        Addressable::URI.parse(authorizer.get_authorization_url)
+      def auth_link(**options)
+        authorized = build_authorizer(options)
+        Addressable::URI.parse(authorized.get_authorization_url)
       end
 
       # Whether or not the current provider is authorized
@@ -258,30 +259,34 @@ module BrowseEverything
       # Constructs the object capturing the state for the session
       # @see .default_authentication_klass
       # @return [Google::Auth::UserAuthorizer]
-      def session
+      def build_session(**options)
+        callback_uri = callback(options)
+
         AuthenticationFactory.new(
           self.class.authentication_klass,
           client_id,
           scope,
           token_store,
-          callback
+          callback_uri
         )
       end
 
-      delegate :authenticate, to: :session
-
       # Authorization Object for Google API
       # @return [Google::Auth::UserAuthorizer]
-      def authorizer
-        @authorizer ||= authenticate
+      def build_authorizer(**options)
+        @authorizer ||= begin
+                          session = build_session(options)
+                          session.authenticate
+                        end
       end
 
       # Request to authorize the provider
       # This is *the* method which, passing an HTTP request, redeems an
       #   authorization code for an access token
       # @return [String] a new access token
-      def authorize!
-        @credentials = authorizer.get_credentials_from_code(user_id: user_id, code: code)
+      def authorize!(**options)
+        authorized = build_authorizer(options)
+        @credentials = authorized.get_credentials_from_code(user_id: user_id, code: code)
         @token = @credentials.access_token
         @code = nil # The authorization code can only be redeemed for an access token once
         @token
@@ -292,9 +297,9 @@ module BrowseEverything
       # @param params [Hash] HTTP response passed to the OAuth callback
       # @param _data [Object,nil] an unused parameter
       # @return [String] a new access token
-      def connect(params, _data = nil, _options = nil)
+      def connect(params, _data = nil, options = {})
         @code = params[:code]
-        authorize!
+        authorize!(**options)
       end
 
       # Construct a new object for interfacing with the Google Drive API
