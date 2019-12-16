@@ -5,7 +5,7 @@ module BrowseEverything
     attr_reader :providers
 
     def initialize(opts = {})
-      opts.deep_symbolize_keys!
+      opts = opts.deep_symbolize_keys
 
       # Handling for legacy arguments
       if opts.key?(:protocol)

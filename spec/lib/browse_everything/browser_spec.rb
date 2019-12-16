@@ -55,9 +55,7 @@ describe BrowseEverything::Browser do
   end
 
   describe 'global config' do
-    let(:browser) { described_class.new(url_options) }
-
-    before { BrowseEverything.configure(global_config) }
+    let(:browser) { described_class.new(global_config) }
 
     it 'has 2 providers' do
       expect(browser.providers.keys).to eq(%w[file_system dropbox])
