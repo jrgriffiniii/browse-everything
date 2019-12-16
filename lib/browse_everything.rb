@@ -58,29 +58,47 @@ module BrowseEverything
       current_browser.session
     end
 
+    def load_config_file(path)
+      config_file_content = File.read(path)
+      config_file_template = ERB.new(config_file_content)
+      YAML.safe_load(config_file_template.result, [Symbol])
+    end
+
+    def config_path
+      Rails.root.join('config', 'browse_everything_providers.yml')
+    end
+
+    def default_options
+      load_config_file(config_path)
+    end
+
     def configure(value)
       return if value.nil?
+      # binding.pry
 
+      options = {}
       if value.is_a?(Hash)
-        @config = ActiveSupport::HashWithIndifferentAccess.new value
+        options = ActiveSupport::HashWithIndifferentAccess.new(value)
       elsif value.is_a?(String)
         begin
-          config_file_content = File.read(value)
-          config_file_template = ERB.new(config_file_content)
-          config_values = YAML.safe_load(config_file_template.result, [Symbol])
-          @config = ActiveSupport::HashWithIndifferentAccess.new config_values
-          @config.deep_symbolize_keys
+          loaded_values = load_config_file(value)
+          options = ActiveSupport::HashWithIndifferentAccess.new(loaded_values)
         rescue Errno::ENOENT
           raise ConfigurationError, 'Missing browse_everything_providers.yml configuration file'
         end
       else
         raise InitializationError, "Unrecognized configuration: #{value.inspect}"
       end
+      # @config = ActiveSupport::HashWithIndifferentAccess.new(options.merge(default_options))
+      # binding.pry
+      @config = ActiveSupport::HashWithIndifferentAccess.new(default_options.merge(options))
 
       if @config.include? 'drop_box' # rubocop:disable Style/GuardClause
         warn '[DEPRECATION] `drop_box` is deprecated.  Please use `dropbox` instead.'
         @config['dropbox'] = @config.delete('drop_box')
       end
+
+      @config
     end
 
     def config

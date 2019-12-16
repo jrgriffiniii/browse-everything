@@ -3,7 +3,7 @@
 include BrowserConfigHelper
 
 describe BrowseEverything::Driver::GoogleDrive do
-  let(:browser) { BrowseEverything::Browser.new(url_options) }
+  let(:browser) { BrowseEverything::Browser.new(stub_configuration) }
   let(:provider) { browser.providers['google_drive'] }
   let(:provider_yml) do
     {
@@ -21,8 +21,6 @@ describe BrowseEverything::Driver::GoogleDrive do
   end
 
   before do
-    stub_configuration
-
     stub_request(
       :post, 'https://oauth2.googleapis.com/token'
     ).to_return(
@@ -32,10 +30,6 @@ describe BrowseEverything::Driver::GoogleDrive do
         'Content-Type' => 'application/json; charset=UTF-8'
       }
     )
-  end
-
-  after do
-    unstub_configuration
   end
 
   describe 'simple properties' do

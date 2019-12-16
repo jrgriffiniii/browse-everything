@@ -3,7 +3,7 @@
 include BrowserConfigHelper
 
 describe BrowseEverything::Driver::Dropbox do
-  let(:browser) { BrowseEverything::Browser.new(url_options) }
+  let(:browser) { BrowseEverything::Browser.new(stub_configuration) }
   let(:provider) { browser.providers['dropbox'] }
   let(:provider_yml) do
     {
@@ -17,8 +17,6 @@ describe BrowseEverything::Driver::Dropbox do
   end
 
   before do
-    stub_configuration
-
     stub_request(
       :post, 'https://api.dropboxapi.com/oauth2/token'
     ).to_return(
@@ -28,10 +26,6 @@ describe BrowseEverything::Driver::Dropbox do
         'Content-Type' => 'text/javascript'
       }
     )
-  end
-
-  after do
-    unstub_configuration
   end
 
   describe '#validate_config' do

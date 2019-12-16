@@ -72,16 +72,16 @@ describe BrowseEverything::Browser do
   end
 
   describe 'local config' do
-    let(:browser) { described_class.new(local_config) }
+    let(:local_browser) { described_class.new(local_config) }
 
     it 'has 2 providers' do
-      expect(browser.providers.keys).to eq(%w[file_system dropbox])
-      expect(browser.providers[:file_system]).to be_a BrowseEverything::Driver::FileSystem
-      expect(browser.providers[:dropbox]).to be_a BrowseEverything::Driver::Dropbox
+      expect(local_browser.providers.keys).to eq(%w[file_system dropbox])
+      expect(local_browser.providers[:file_system]).to be_a BrowseEverything::Driver::FileSystem
+      expect(local_browser.providers[:dropbox]).to be_a BrowseEverything::Driver::Dropbox
     end
 
     it 'uses the local configuration' do
-      file_provider = browser.providers[:file_system]
+      file_provider = local_browser.providers[:file_system]
       expect(file_provider.config[:home]).to eq('/local/config/home')
       expect(file_provider.config['home']).to eq('/local/config/home')
     end

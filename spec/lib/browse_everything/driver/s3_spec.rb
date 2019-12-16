@@ -5,16 +5,8 @@ include BrowserConfigHelper
 describe BrowseEverything::Driver::S3 do
   subject { provider }
 
-  let(:browser)  { BrowseEverything::Browser.new(url_options) }
+  let(:browser)  { BrowseEverything::Browser.new(stub_configuration) }
   let(:provider) { browser.providers['s3'] }
-
-  before do
-    stub_configuration
-  end
-
-  after do
-    unstub_configuration
-  end
 
   describe 'defaults' do
     its(:icon)   { is_expected.to eq('amazon')  }

@@ -5,7 +5,7 @@ include BrowserConfigHelper
 describe BrowseEverything::Driver::Box do
   subject { provider }
 
-  let(:browser) { BrowseEverything::Browser.new(url_options) }
+  let(:browser) { BrowseEverything::Browser.new(stub_configuration) }
   let(:provider) { browser.providers['box'] }
   let(:auth_params) do
     {
@@ -22,8 +22,6 @@ describe BrowseEverything::Driver::Box do
   let(:oauth_response_body) { '{"access_token":"TOKEN","expires_in":3762,"restricted_to":[],"refresh_token":"REFRESH_TOKEN","token_type":"bearer"}' }
 
   before do
-    stub_configuration
-
     stub_request(
       :post,
       'https://www.box.com/api/oauth2/token'
@@ -34,10 +32,6 @@ describe BrowseEverything::Driver::Box do
         'Content-Type' => 'application/json'
       }
     )
-  end
-
-  after do
-    unstub_configuration
   end
 
   its(:name) { is_expected.to eq('Box') }
@@ -51,7 +45,7 @@ describe BrowseEverything::Driver::Box do
   end
 
   describe '#auth_link' do
-    subject { provider.auth_link }
+    subject { provider.auth_link(host: 'localhost', port: 3000) }
 
     it { is_expected.to start_with('https://www.box.com/api/oauth2/authorize') }
     it { is_expected.to include('browse%2Fconnect') }

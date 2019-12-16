@@ -168,7 +168,6 @@ module BrowseEverything
         return pages[page_token] if pages.indexed? page_token
 
         request_params = Auth::Google::RequestParameters.new
-        request_params.q += " and '#{path}' in parents " if path.present?
 
         restore_credentials(access_token) if @credentials.nil?
         list_files(drive_service, request_params, path: path, page_token: page_token)

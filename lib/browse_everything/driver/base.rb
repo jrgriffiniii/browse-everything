@@ -158,8 +158,8 @@ module BrowseEverything
 
         # Generate the URL for the API callback
         # @return [String]
-        def callback
-          connector_response_url(callback_options)
+        def callback(**options)
+          connector_response_url(callback_options.merge(options))
         end
     end
   end

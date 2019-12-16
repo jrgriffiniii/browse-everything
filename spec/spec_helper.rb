@@ -62,27 +62,29 @@ module BrowserConfigHelper
   end
 
   def stub_configuration
-    BrowseEverything.configure('file_system' => {
-                                 home: File.expand_path('fixtures/file_system', __dir__)
-                               },
-                               'box' => {
-                                 client_id: 'BoxClientId',
-                                 client_secret: 'BoxClientSecret'
-                               },
-                               'dropbox' => {
-                                 client_id: 'DropboxId',
-                                 client_secret: 'DropboxClientSecret'
-                               },
-                               'google_drive' => {
-                                 client_id: 'GoogleClientId',
-                                 client_secret: 'GoogleClientSecret'
-                               },
-                               's3' => {
-                                 client_id: 'S3AppKey',
-                                 client_secret: 'S3AppSecret',
-                                 bucket: 's3.bucket',
-                                 region: 'us-east-1'
-                               })
+    {
+      'file_system' => {
+        home: File.expand_path('fixtures/file_system', __dir__)
+      },
+      'box' => {
+        client_id: 'BoxClientId',
+        client_secret: 'BoxClientSecret'
+      },
+      'dropbox' => {
+        client_id: 'DropboxId',
+        client_secret: 'DropboxClientSecret'
+      },
+      'google_drive' => {
+        client_id: 'GoogleClientId',
+        client_secret: 'GoogleClientSecret'
+      },
+      's3' => {
+        client_id: 'S3AppKey',
+        client_secret: 'S3AppSecret',
+        bucket: 's3.bucket',
+        region: 'us-east-1'
+      }
+    }
   end
 
   def unstub_configuration

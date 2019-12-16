@@ -4,7 +4,7 @@ include BrowserConfigHelper
 
 describe BrowseEverything::Driver::FileSystem do
   let(:home)    { File.expand_path(BrowseEverything.config['file_system'][:home]) }
-  let(:browser) { BrowseEverything::Browser.new(url_options) }
+  let(:browser) { BrowseEverything::Browser.new(stub_configuration) }
   let(:provider) { browser.providers['file_system'] }
 
   before do
@@ -115,7 +115,8 @@ describe BrowseEverything::Driver::FileSystem do
               file_name: 'file',
               file_size: 0,
               id: '/path/to/file',
-              provider: 'file_system'
+              provider: 'file_system',
+              type: "application/octet-stream"
             }
           ]
         ]
