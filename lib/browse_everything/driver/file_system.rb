@@ -12,6 +12,7 @@ module BrowseEverything
       end
 
       def contents(path = '', _page_index = 0, _auth_token = nil)
+        path = "/#{path}" unless path =~ /^\//
         real_path = if path == '/' || !File.exist?(path)
                       File.join(home_path, path)
                     else
