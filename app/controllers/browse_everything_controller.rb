@@ -94,8 +94,8 @@ class BrowseEverythingController < ActionController::Base
         result = { url: url }
         result.merge!(extra) unless extra.nil?
         selected_links << result unless result.fetch(:directory, false)
-        # These are being ignored
-        selected_directories << result if result.fetch(:directory, false) && !selected_directories.include?(result)
+        # Returning separate Arrays of files and directories will not be possible until 2.0
+        selected_links << result if result.fetch(:directory, false) && !selected_directories.include?(result)
       end
     end
 
