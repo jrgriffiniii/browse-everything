@@ -12,6 +12,7 @@ module BrowseEverything
       end
 
       def contents(path = '', _page_index = 0, _auth_token = nil)
+        # This is required for Rails controller parameter handling for file paths
         path = "/#{path}" unless path =~ /^\//
         real_path = if path == '/' || !File.exist?(path)
                       File.join(home_path, path)
