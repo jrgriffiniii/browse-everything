@@ -79,8 +79,6 @@ class BrowseEverythingController < ActionController::Base
     # This needs to just pass URLs
     selected_files = browse_everything_params || selected_params || []
     selected_links = []
-    selected_directories = []
-    payload = {}
 
     selected_files.each do |file|
       location = file[:location]
@@ -93,17 +91,14 @@ class BrowseEverythingController < ActionController::Base
         (url, extra) = value
         result = { url: url }
         result.merge!(extra) unless extra.nil?
-        selected_links << result unless result.fetch(:directory, false)
         # Returning separate Arrays of files and directories will not be possible until 2.0
-        selected_links << result if result.fetch(:directory, false) && !selected_directories.include?(result)
+        selected_links << result
       end
     end
 
-    payload = selected_links
-
     respond_to do |format|
       format.html { render layout: false }
-      format.json { render json: payload }
+      format.json { render json: selected_links }
     end
   end
 
