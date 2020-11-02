@@ -1,7 +1,8 @@
 # Skipping test because rails 5.1.0 generates with an old version of capybara
 rails_options:
-  - "--skip-test"
-  - "<%= '--skip-listen' if ENV.fetch('RAILS_VERSION', '') < '5.0' %>"
   - "--skip-javascript"
-  - "<%= '--skip-webpack-install' if ENV['RAILS_SPROCKETS'] == 'true' %>"
+  - "<%= '--skip-listen' if ENV.fetch('RAILS_VERSION', '') < '5.0' %>"
   - "--skip-sprockets"
+  - "--skip-test"
+  - "<%= '--skip-webpack-install' if ENV['RAILS_SPROCKETS'] == 'true' %>"
+  - "<%= '--webpack' if ENV['RAILS_VERSION'] < '6.0' && ENV['RAILS_SPROCKETS'] != 'true' %>"

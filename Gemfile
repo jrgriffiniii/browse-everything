@@ -35,26 +35,25 @@ else
 
   case ENV['RAILS_VERSION']
   when /^6\.0/
-
     # This will only be necessary until release 6.0.1 is published
-    if ENV["SPROCKETS_RAILS"] == "true"
+    if ENV["RAILS_SPROCKETS"] == "true"
       # This will ensure that Webpacker is not installed
       ENV["SKIP_REQUIRE_WEBPACKER"] = "true"
       gem 'sass-rails', '~> 6.0'
     else
-      gem 'webpacker', "~> 5.0"
+      gem 'webpacker', "~> 5.2"
     end
   when /^5\./
-    gem 'capybara', '~> 2.18.0'
-    gem 'sass-rails', '~> 5'
-  when /^4\./
-    gem 'coffee-rails', '~> 4.1.0'
-    gem 'json', '~> 1.8'
-    gem 'railties', '~> 4.2'
-    gem 'responders', '~> 2.0'
-    gem 'sass-rails', '>= 5.0'
-  else
-    gem 'sass-rails'
+    gem "capybara", ">= 2.15"
+
+    # This will only be necessary until release 6.0.1 is published
+    if ENV["RAILS_SPROCKETS"] == "true"
+      # This will ensure that Webpacker is not installed
+      ENV["SKIP_REQUIRE_WEBPACKER"] = "true"
+      gem 'sass-rails', '~> 5.1'
+    else
+      gem 'webpacker', "~> 5.2"
+    end
   end
 end
 # END ENGINE_CART BLOCK

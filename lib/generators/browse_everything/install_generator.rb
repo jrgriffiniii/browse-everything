@@ -8,7 +8,7 @@ class BrowseEverything::InstallGenerator < Rails::Generators::Base
   source_root File.expand_path('templates', __dir__)
 
   def run_webpack
-    return if ENV["SPROCKETS_RAILS"] == "true"
+    return if ENV["RAILS_SPROCKETS"] == "true"
 
     rails_command "webpacker:install"
   end
