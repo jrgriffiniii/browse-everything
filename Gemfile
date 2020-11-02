@@ -46,8 +46,8 @@ else
       gem 'webpacker', "~> 5.2"
     end
   when /^5\.2/
-    gem 'puma', '~> 4.1'
     gem "capybara", ">= 2.15"
+    gem 'puma', '~> 4.1'
 
     # This will only be necessary until release 6.0.1 is published
     if ENV["RAILS_SPROCKETS"] == "true"
@@ -58,8 +58,8 @@ else
       gem 'webpacker', "~> 5.2"
     end
   when /^5\.1/
-    gem 'puma', '~> 3.7'
     gem "capybara", ">= 2.15"
+    gem 'puma', '~> 3.7'
 
     # This will only be necessary until release 6.0.1 is published
     if ENV["RAILS_SPROCKETS"] == "true"
