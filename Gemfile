@@ -39,6 +39,7 @@ else
     if ENV["RAILS_SPROCKETS"] == "true"
       # This will ensure that Webpacker is not installed
       ENV["SKIP_REQUIRE_WEBPACKER"] = "true"
+      gem 'puma', '~> 4.1'
       gem 'sass-rails', '~> 6.0'
     else
       gem 'webpacker', "~> 5.2"
