@@ -35,9 +35,15 @@ else
 
   case ENV['RAILS_VERSION']
   when /^6\.0/
+
     # This will only be necessary until release 6.0.1 is published
-    # This will ensure that Webpacker is not installed
-    ENV["SKIP_REQUIRE_WEBPACKER"] = "true"
+    if ENV["SPROCKETS_RAILS"] == "true"
+      # This will ensure that Webpacker is not installed
+      ENV["SKIP_REQUIRE_WEBPACKER"] = "true"
+      gem 'sass-rails', '~> 6.0'
+    else
+      gem 'webpacker', "~> 5.0"
+    end
   when /^5\./
     gem 'capybara', '~> 2.18.0'
     gem 'sass-rails', '~> 5'
