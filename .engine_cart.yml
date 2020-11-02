@@ -2,5 +2,6 @@
 rails_options:
   - "--skip-test"
   - "<%= '--skip-listen' if ENV.fetch('RAILS_VERSION', '') < '5.0' %>"
-  - "<%= '--skip-javascript' if ENV.fetch['RAILS_SPROCKETS'] == 'true' %>"
+  - "--skip-javascript"
+  - "<%= '--skip-webpack-install' if ENV['RAILS_SPROCKETS'] == 'true' %>"
   - "--skip-sprockets"
