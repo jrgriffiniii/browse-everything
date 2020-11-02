@@ -28,7 +28,7 @@ class TestAppGenerator < Rails::Generators::Base
   end
 
   def inject_javascript
-    if Rails.version =~ /^6\./
+    if /^6\.0/.match?(Rails.version)
       copy_file 'app/assets/javascripts/application.js', 'app/assets/javascripts/application.js'
 
       # Does this means that Webpacker becomes a hard-dependency?

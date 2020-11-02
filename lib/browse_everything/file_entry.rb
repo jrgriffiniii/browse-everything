@@ -2,6 +2,10 @@
 
 module BrowseEverything
   class FileEntry
+    def self.relative_parent_pattern
+      /^\.\.?$/
+    end
+
     attr_reader :id, :location, :name, :size, :mtime, :type
 
     def initialize(id, location, name, size, mtime, container, type = nil)
@@ -15,7 +19,7 @@ module BrowseEverything
     end
 
     def relative_parent_path?
-      name =~ /^\.\.?$/ ? true : false
+      self.class.relative_parent_pattern.match?(name)
     end
 
     def container?

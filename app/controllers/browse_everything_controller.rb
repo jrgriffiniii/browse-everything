@@ -2,7 +2,7 @@
 
 require File.expand_path('../helpers/browse_everything_helper', __dir__)
 
-class BrowseEverythingController < ActionController::Base
+class BrowseEverythingController < ApplicationController
   layout 'browse_everything'
   helper BrowseEverythingHelper
 
