@@ -4,7 +4,14 @@ include BrowserConfigHelper
 
 describe BrowseEverything::Browser do
   let(:file_config) do
-    "file_system:\n  home: '/file/config/home'\ndropbox:\n  client_id: 'DropboxId'\n  client_secret: 'DropboxClientSecret'\n  download_directory: 'tmp/'"
+    <<-YAML
+    file_system:
+      home: '/file/config/home'
+    dropbox:
+      client_id: 'DropboxId'
+      client_secret: 'DropboxClientSecret'
+      download_directory: 'tmp/'
+    YAML
   end
 
   let(:global_config) do
