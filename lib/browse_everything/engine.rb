@@ -2,7 +2,7 @@
 
 module BrowseEverything
   class Engine < ::Rails::Engine
-    if Rails.version < '5.2'
+    if Rails.version < '5.1'
       config.assets.paths << config.root.join('vendor', 'assets', 'javascripts')
       config.assets.paths << config.root.join('vendor', 'assets', 'stylesheets')
       config.assets.precompile += %w[browse_everything.js browse_everything.css]

@@ -35,16 +35,18 @@ else
 
   case ENV['RAILS_VERSION']
   when /^6\.0/
+    gem 'puma', '~> 4.1'
+
     # This will only be necessary until release 6.0.1 is published
     if ENV["RAILS_SPROCKETS"] == "true"
       # This will ensure that Webpacker is not installed
       ENV["SKIP_REQUIRE_WEBPACKER"] = "true"
-      gem 'puma', '~> 4.1'
       gem 'sass-rails', '~> 6.0'
     else
       gem 'webpacker', "~> 5.2"
     end
-  when /^5\./
+  when /^5\.2/
+    gem 'puma', '~> 4.1'
     gem "capybara", ">= 2.15"
 
     # This will only be necessary until release 6.0.1 is published
@@ -54,6 +56,18 @@ else
       gem 'sass-rails', '~> 5.1'
     else
       gem 'webpacker', "~> 5.2"
+    end
+  when /^5\.1/
+    gem 'puma', '~> 3.7'
+    gem "capybara", ">= 2.15"
+
+    # This will only be necessary until release 6.0.1 is published
+    if ENV["RAILS_SPROCKETS"] == "true"
+      # This will ensure that Webpacker is not installed
+      ENV["SKIP_REQUIRE_WEBPACKER"] = "true"
+      gem 'sass-rails', '~> 5.1'
+    else
+      gem 'webpacker', "~> 4.3"
     end
   end
 end
