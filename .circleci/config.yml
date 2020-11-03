@@ -52,6 +52,11 @@ jobs:
           name: Install Karma for JavaScript and functional tests
           command: sudo npm install -g karma karma-jasmine karma-chrome-launcher
 
+      - run:
+          name: Build the Webpack manifests
+          command: |
+            bundle exec webpack-dev-server
+
       - samvera/parallel_rspec
 
 workflows:

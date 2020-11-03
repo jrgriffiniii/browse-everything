@@ -24,15 +24,19 @@ describe 'Choosing files', type: :feature, js: true do
     end
   end
 
-  context 'when Turbolinks are enabled', fail: true do
-    before { click_link('Enter Test App (Turbolinks)') }
+  if ENV["RAILS_TURBOLINKS"] == "true"
 
-    it_behaves_like 'browseable files'
-  end
+    context 'when Turbolinks are enabled', fail: true do
+      before { click_link('Enter Test App (Turbolinks)') }
 
-  context 'when Turbolinks are disabled' do
-    before { click_link('Enter Test App (No Turbolinks)') }
+      it_behaves_like 'browseable files'
+    end
+  else
 
-    it_behaves_like 'browseable files'
+    context 'when Turbolinks are disabled' do
+      before { click_link('Enter Test App (No Turbolinks)') }
+
+      it_behaves_like 'browseable files'
+    end
   end
 end
