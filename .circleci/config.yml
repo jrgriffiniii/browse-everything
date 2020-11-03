@@ -51,6 +51,10 @@ jobs:
             bundle exec rake engine_cart:generate
 
       - run:
+          name: Install dependencies
+          command: bundle check || bundle install
+
+      - run:
           name: Install Karma for JavaScript and functional tests
           command: |
             yarn global add karma karma-jasmine karma-chrome-launcher
@@ -60,7 +64,7 @@ jobs:
           command: |
             if [[ "$RAILS_SPROCKETS" != "true" ]]; then
               cd .internal_test_app
-              bundle install
+              bundle check || bundle install
               bundle exec bin/webpack
             fi
 
