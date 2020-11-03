@@ -16,12 +16,20 @@ jobs:
       rails_sprockets:
         type: string
         default: "false"
+      bootstrap_version:
+        type: string
+        default: "4"
+      rails_turbolinks:
+        type: string
+        default: "false"
     executor:
       name: 'samvera/ruby'
       ruby_version: << parameters.ruby_version >>
     environment:
       RAILS_VERSION: << parameters.rails_version >>
       RAILS_SPROCKETS: << parameters.rails_sprockets >>
+      TEST_BOOTSTRAP: << parameters.bootstrap_version >>
+      RAILS_TURBOLINKS: << parameters.rails_turbolinks >>
     steps:
       - samvera/cached_checkout
 
@@ -54,6 +62,16 @@ workflows:
           ruby_version: 2.6.5
           rails_version: 6.0.3
           rails_sprockets: "true"
+      - build:
+          name: "ruby2-6_rails6-0-bootstrap3"
+          ruby_version: 2.6.5
+          rails_version: 6.0.3
+          bootstrap_version: "3"
+      - build:
+          name: "ruby2-6_rails6-0-turbolinks"
+          ruby_version: 2.6.5
+          rails_version: 6.0.3
+          rails_turbolinks: "true"
       - build:
           name: "ruby2-6_rails6-0"
           ruby_version: 2.6.5

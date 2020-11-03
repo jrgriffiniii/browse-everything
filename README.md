@@ -33,7 +33,7 @@ what this means can be found
 
 ### Product Owner
 
-[mbklein](https://github.com/mbklein)
+[jrgriffiniii](https://github.com/jrgriffiniii)
 
 # Getting Started
 

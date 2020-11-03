@@ -28,22 +28,29 @@ class TestAppGenerator < Rails::Generators::Base
   end
 
   def inject_javascript
-    if /^6\.0/.match?(Rails.version)
+    if Rails.version >= '6.0' && ENV['RAILS_SPROCKETS'] != 'true'
       copy_file 'app/assets/javascripts/application.js', 'app/assets/javascripts/application.js'
 
-      # Does this means that Webpacker becomes a hard-dependency?
       insert_into_file 'app/assets/config/manifest.js', after: '//= link_directory ../stylesheets .css' do
         %(
           //= link_directory ../javascripts .js
         )
       end
 
-      insert_into_file 'app/views/layouts/application.html.erb', after: "<%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>" do
+      insert_into_file 'app/views/layouts/application.html.erb', before: "</head>" do
         %(
           <%= javascript_include_tag 'application' %>
         )
       end
     else
+      if ENV['RAILS_TURBOLINKS'] == 'true'
+        insert_into_file 'app/assets/javascripts/application.js', after: '//= require_tree .' do
+          %(
+            //= require turbolinks
+          )
+        end
+      end
+
       insert_into_file 'app/assets/javascripts/application.js', after: '//= require_tree .' do
         %(
           //= require jquery

@@ -70,6 +70,8 @@ else
       gem 'webpacker', "~> 4.3"
     end
   end
+
+  gem 'turbolinks', '~> 5' if ENV["RAILS_TURBOLINKS"] == "true"
 end
 # END ENGINE_CART BLOCK
 
