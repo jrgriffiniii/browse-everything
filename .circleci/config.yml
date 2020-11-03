@@ -43,10 +43,15 @@ jobs:
           command: |
             bundle exec rake engine_cart:generate
 
-      - samvera/bundle_for_gem:
-          ruby_version: << parameters.ruby_version >>
-          bundler_version: << parameters.bundler_version >>
-          project: 'browse-everything'
+      - run:
+          name: Update bundler
+          command: |
+            echo 'export BUNDLER_VERSION=<< parameters.bundler_version >>' >> $BASH_ENV
+            gem install bundler -v << parameters.bundler_version >>
+
+      - run:
+          name: Install dependencies
+          command: bundle check || bundle install
 
       - samvera/rubocop
 
