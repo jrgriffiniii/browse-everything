@@ -63,7 +63,8 @@ jobs:
           name: Build the Webpack manifests
           command: |
             cd .internal_test_app
-            bundle exec webpack-dev-server
+            bundle install
+            bundle exec bin/webpack
 
       - samvera/parallel_rspec
 
