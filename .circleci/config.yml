@@ -33,16 +33,6 @@ jobs:
     steps:
       - samvera/cached_checkout
 
-      - samvera/bundle_for_gem:
-          bundler_version: << parameters.bundler_version >>
-          ruby_version: << parameters.ruby_version >>
-          project: 'browse-everything'
-
-      - run:
-          name: Generate test
-          command: |
-            bundle exec rake engine_cart:generate
-
       - run:
           name: Update bundler
           command: |
@@ -56,15 +46,23 @@ jobs:
       - samvera/rubocop
 
       - run:
+          name: Generate test
+          command: |
+            bundle exec rake engine_cart:generate
+
+      - run:
           name: Install Karma for JavaScript and functional tests
-          command: sudo npm install -g karma karma-jasmine karma-chrome-launcher
+          command: |
+            yarn global add karma karma-jasmine karma-chrome-launcher
 
       - run:
           name: Build the Webpack manifests
           command: |
-            cd .internal_test_app
-            bundle install
-            bundle exec bin/webpack
+            if [[ "$RAILS_SPROCKETS" != "true" ]]; then
+              cd .internal_test_app
+              bundle install
+              bundle exec bin/webpack
+            fi
 
       - samvera/parallel_rspec
 
